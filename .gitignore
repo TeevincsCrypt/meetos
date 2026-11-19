@@ -23,3 +23,7 @@ apps/android/.idea/
 *.iml
 *.keystore
 *.jks
+apps/android/verify/.gradle/
+apps/android/verify/build/
+apps/android/.kotlin/
+apps/android/verify/.kotlin/

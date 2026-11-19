@@ -13,7 +13,7 @@ actually ran.
 
 | | |
 |---|---|
-| Web app | `apps/web` — Vite + React 19 + TypeScript + Tailwind v4 (primary target) |
+| Web app | `apps/web` — Vite + React 19 + TypeScript + Tailwind v4 (primary target, deployed on Vercel) |
 | Android app | `apps/android` — Kotlin + Jetpack Compose, Room, Firebase Android SDK |
 | Shared logic | `packages/shared` — domain model, grounding, chunking, linking, retrieval, metrics |
 | Firebase | `firebase/` — security rules, indexes, rules tests |
@@ -71,6 +71,10 @@ Open http://localhost:5173, create an account, and choose **Create demo workspac
 labelled sample data). With emulators there is no real Firebase project, so **cloud** AI calls
 fail; **on-device** AI works in a supported desktop Chrome. To use cloud Gemini, connect a real
 project — see [`docs/SETUP.md`](docs/SETUP.md).
+
+## Deploy
+
+The web app deploys to **Vercel** (`apps/web/vercel.json`, root directory `apps/web`) or Firebase Hosting (`firebase.json`). Step-by-step: [`docs/SETUP.md` §9](docs/SETUP.md#9-run-and-deploy-the-web-app).
 
 ## Tests
 

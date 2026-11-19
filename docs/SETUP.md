@@ -92,6 +92,8 @@ browsers MEETOS uses the cloud and labels results "In the cloud".
 
 ## 9. Run and deploy the web app
 
+Run locally:
+
 ```bash
 pnpm install
 ```
@@ -99,6 +101,48 @@ pnpm install
 ```bash
 pnpm dev
 ```
+
+### Deploy on Vercel (recommended for testing)
+
+`apps/web/vercel.json` already contains the build settings, the single-page-app fallback
+(so links like `/app/meetings/123` work on refresh) and security headers, including the
+microphone permission that live capture needs.
+
+1. **Import the repo:** vercel.com → **Add New… → Project** → import your GitHub repository.
+2. **Root Directory:** click **Edit** and choose `apps/web`. Leave **"Include files outside
+   the root directory in the Build Step"** enabled — the app uses `packages/shared`.
+   Framework, install/build commands and output directory are read from `vercel.json`.
+3. **Environment variables** (Settings → Environment Variables, for Production and Preview):
+
+   | Name | Value |
+   |---|---|
+   | `VITE_FIREBASE_API_KEY` | from Firebase web app config |
+   | `VITE_FIREBASE_AUTH_DOMAIN` | e.g. `your-project.firebaseapp.com` |
+   | `VITE_FIREBASE_PROJECT_ID` | your project ID |
+   | `VITE_FIREBASE_STORAGE_BUCKET` | from config |
+   | `VITE_FIREBASE_MESSAGING_SENDER_ID` | from config |
+   | `VITE_FIREBASE_APP_ID` | from config |
+   | `VITE_AI_BACKEND` | `googleai` |
+   | `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY` | only if you use App Check (§6) |
+
+   Do **not** set `VITE_APPCHECK_DEBUG` on Vercel. These values are compiled into the
+   build, so redeploy after changing them.
+4. **Deploy.** You get a URL like `https://meetos-xyz.vercel.app`.
+5. **Authorize the domain in Firebase:** Authentication → Settings → **Authorized domains**
+   → add `meetos-xyz.vercel.app` (without `https://`). Without this, Google sign-in fails
+   with `auth/unauthorized-domain`.
+6. **App Check (if enabled):** Google Cloud console → Security → reCAPTCHA → your key →
+   add the same domain.
+
+Vercel preview deployments get a new domain each time, and each one would need steps 5–6.
+Give judges your fixed production URL (`*.vercel.app` or a custom domain).
+
+If the build fails with a pnpm version error, add the environment variable
+`ENABLE_EXPERIMENTAL_COREPACK=1` so Vercel uses the pnpm version pinned in `package.json`.
+
+### Alternative: Firebase Hosting
+
+`firebase.json` is also configured for Firebase Hosting:
 
 ```bash
 pnpm build && npx firebase deploy --only hosting

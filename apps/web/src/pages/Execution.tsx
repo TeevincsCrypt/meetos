@@ -55,11 +55,11 @@ export default function ExecutionPage() {
   const filters = (
     <div className="flex flex-wrap items-center gap-2">
       <Segmented<Period> value={period} onChange={setPeriod} options={[{ id: '30', label: '30 days' }, { id: '90', label: '90 days' }, { id: 'all', label: 'All time' }]} />
-      <Select aria-label="Project" value={projectId} onChange={(e) => setProjectId(e.target.value)} className="w-40">
+      <Select aria-label="Project" value={projectId} onChange={(e) => setProjectId(e.target.value)} className="sm:w-44">
         <option value="">All projects</option>
         {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
       </Select>
-      <Select aria-label="Owner" value={owner} onChange={(e) => setOwner(e.target.value)} className="w-40">
+      <Select aria-label="Owner" value={owner} onChange={(e) => setOwner(e.target.value)} className="sm:w-44">
         <option value="">Everyone</option>
         {owners.map(([k, n]) => <option key={k} value={k}>{n}</option>)}
       </Select>

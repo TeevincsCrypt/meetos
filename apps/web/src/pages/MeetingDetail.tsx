@@ -28,7 +28,8 @@ import { useWs } from '@/state/workspace';
 import { deleteMeeting, listenMeeting, listenTranscript, saveTranscript, setMeetingArchived, updateMeeting } from '@/data/meetings';
 import { fromSnap, wsCol } from '@/data/db';
 import { fmtDate, fmtDateTime, fmtRelative, fromDateTimeInput, toDateTimeInput } from '@/lib/format';
-import { Avatar, Badge, Button, ButtonLink, Card, CardHeader, EmptyState, ErrorNote, Field, Input, Menu, Modal, Notice, PageHeader, Skeleton, Tabs, Textarea } from '@/components/ui';
+import { Avatar, Badge, Button, ButtonLink, Card, CardHeader, EmptyState, ErrorNote, Field, Input, Menu, Modal, Notice, Skeleton, Tabs, Textarea } from '@/components/ui';
+import { MeetingHeader } from '@/components/MeetingHeader';
 import { EvidenceQuote, InferenceBadge, SampleBadge } from '@/components/domain';
 import { AnalyzePanel } from '@/components/AnalyzePanel';
 import { CommitmentRow, DecisionCard, PendingCompletionBar, QuestionRow } from '@/components/Items';
@@ -262,29 +263,25 @@ export default function MeetingDetailPage() {
       <Link to="/app/meetings" className="mb-3 inline-flex items-center gap-1 text-[12.5px] text-fg-3 hover:text-fg-2">
         <ArrowLeft className="size-3.5" aria-hidden /> Meetings
       </Link>
-      <PageHeader
+      <MeetingHeader
+        className="mb-5"
         title={meeting.title}
-        description={
-          <span className="flex flex-wrap items-center gap-2">
+        subtitle={meeting.description || (project ? project.name : 'Meeting workspace')}
+        topLeft={
+          <>
             <MeetingStatusBadge status={meeting.status} />
             {meeting.isSample && <SampleBadge />}
             {meeting.archived && <Badge>Archived</Badge>}
-            <span className="text-fg-3">{fmtDateTime(meeting.startedAt ?? meeting.scheduledAt ?? meeting.createdAt)}</span>
-            {project && (
-              <span className="inline-flex items-center gap-1 text-fg-3">
-                <span className="size-2 rounded-full" style={{ background: project.color }} aria-hidden /> {project.name}
-              </span>
-            )}
-          </span>
+          </>
         }
-        actions={
+        topRight={
           <>
             {meeting.status === 'scheduled' && (
-              <ButtonLink to={`/app/prepare?meeting=${meeting.id}`} icon={ClipboardList}>Prepare</ButtonLink>
+              <ButtonLink to={`/app/prepare?meeting=${meeting.id}`} icon={ClipboardList} size="sm">Prepare</ButtonLink>
             )}
-            <ButtonLink to={`/app/meetings/${meeting.id}/live`} icon={Mic} variant={hasTranscript ? 'secondary' : 'primary'}>{hasTranscript ? 'Record more' : 'Record'}</ButtonLink>
+            <ButtonLink to={`/app/meetings/${meeting.id}/live`} icon={Mic} size="sm" variant={hasTranscript ? 'secondary' : 'primary'}>{hasTranscript ? 'Record more' : 'Record'}</ButtonLink>
             <Menu
-              trigger={<Button size="icon" icon={MoreHorizontal} aria-label="More actions" />}
+              trigger={<Button size="icon" icon={MoreHorizontal} aria-label="More actions" className="size-8" />}
               items={[
                 { label: 'Edit details', icon: Pencil, onSelect: () => setEditOpen(true) },
                 { label: meeting.archived ? 'Unarchive' : 'Archive', icon: meeting.archived ? ArchiveRestore : Archive, onSelect: () => void setMeetingArchived(wid, actor, meeting, !meeting.archived) },
@@ -294,6 +291,20 @@ export default function MeetingDetailPage() {
             />
           </>
         }
+        bottomLeft={{ label: 'Meet date', value: fmtDateTime(meeting.startedAt ?? meeting.scheduledAt ?? meeting.createdAt) }}
+        bottomRight={{
+          label: 'Participants',
+          value: meeting.participants.length ? (
+            <span className="flex -space-x-1.5">
+              {meeting.participants.slice(0, 5).map((p) => (
+                <span key={p.name} className="rounded-full ring-2 ring-surface" title={p.name}><Avatar name={p.name} size={30} /></span>
+              ))}
+              {meeting.participants.length > 5 && (
+                <span className="flex size-[30px] items-center justify-center rounded-full bg-surface-2 text-[11px] font-semibold text-fg-2 ring-2 ring-surface">+{meeting.participants.length - 5}</span>
+              )}
+            </span>
+          ) : <span className="text-[14px] text-fg-3">None listed</span>,
+        }}
       />
 
       <Tabs

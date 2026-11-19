@@ -10,21 +10,22 @@ export const cn = clsx;
 
 // ---------------------------------------------------------------- Button
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle' | 'soft';
 type Size = 'sm' | 'md' | 'lg' | 'icon';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand text-white hover:bg-brand-hover shadow-card dark:text-[#06201d]',
-  secondary: 'bg-surface text-fg border border-line hover:bg-surface-2 hover:border-line-strong shadow-card',
+  primary: 'bg-brand text-white hover:bg-brand-hover shadow-[0_6px_16px_-6px_var(--ring)] dark:text-[#120d2b]',
+  secondary: 'bg-surface text-fg border border-line hover:bg-surface-2 hover:border-line-strong',
   ghost: 'text-fg-2 hover:text-fg hover:bg-surface-2',
   subtle: 'bg-surface-2 text-fg hover:bg-surface-3',
-  danger: 'bg-danger text-white hover:opacity-90 shadow-card dark:text-[#2a0c0a]',
+  soft: 'bg-brand-soft text-brand-text hover:brightness-95',
+  danger: 'bg-danger text-white hover:brightness-95 shadow-[0_6px_16px_-6px_rgba(224,50,43,0.5)] dark:text-[#2a0c0a]',
 };
 const sizes: Record<Size, string> = {
-  sm: 'h-8 px-2.5 text-[13px] gap-1.5 rounded-md',
-  md: 'h-9 px-3.5 text-[13.5px] gap-2 rounded-lg',
-  lg: 'h-11 px-5 text-[15px] gap-2 rounded-lg',
-  icon: 'h-8 w-8 rounded-md justify-center',
+  sm: 'h-8 px-3 text-[12.5px] gap-1.5 rounded-full',
+  md: 'h-10 px-4 text-[13px] gap-2 rounded-full',
+  lg: 'h-12 px-6 text-[14.5px] gap-2 rounded-full',
+  icon: 'size-10 rounded-full justify-center',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -75,7 +76,7 @@ export function ButtonLink({ to, variant = 'secondary', size = 'md', icon: Icon,
 
 export function Card({ className, children, ...rest }: { className?: string; children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('rounded-xl border border-line bg-surface shadow-card', className)} {...rest}>
+    <div className={cn('rounded-[20px] border border-line bg-surface shadow-card', className)} {...rest}>
       {children}
     </div>
   );
@@ -83,10 +84,14 @@ export function Card({ className, children, ...rest }: { className?: string; chi
 
 export function CardHeader({ title, subtitle, action, icon: Icon }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; icon?: LucideIcon }) {
   return (
-    <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3">
+    <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-3">
       <div className="min-w-0">
-        <h3 className="flex items-center gap-2 text-[13.5px] font-semibold text-fg">
-          {Icon && <Icon className="size-4 text-fg-3" aria-hidden />}
+        <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-fg">
+          {Icon && (
+            <span className="flex size-7 items-center justify-center rounded-full bg-surface-2 text-fg-3">
+              <Icon className="size-3.5" aria-hidden />
+            </span>
+          )}
           {title}
         </h3>
         {subtitle && <p className="mt-0.5 text-[12.5px] text-fg-3">{subtitle}</p>}
@@ -113,7 +118,7 @@ const tones: Record<Tone, string> = {
 
 export function Badge({ tone = 'neutral', children, className, icon: Icon, title }: { tone?: Tone; children: ReactNode; className?: string; icon?: LucideIcon; title?: string }) {
   return (
-    <span title={title} className={cn('inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[11.5px] font-medium leading-4 whitespace-nowrap', tones[tone], className)}>
+    <span title={title} className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium leading-4 whitespace-nowrap', tones[tone], className)}>
       {Icon && <Icon className="size-3" aria-hidden />}
       {children}
     </span>
@@ -122,20 +127,23 @@ export function Badge({ tone = 'neutral', children, className, icon: Icon, title
 
 // ---------------------------------------------------------------- Form controls
 
+/** Full width unless the caller sets an explicit base width (e.g. `w-40`). */
+const widthOf = (className?: string) => (/(^|\s)w-/.test(className ?? '') ? '' : 'w-full');
+
 const control =
-  'w-full rounded-lg border border-line bg-surface px-3 text-[13.5px] text-fg placeholder:text-fg-3 shadow-card transition-colors focus:border-brand focus:outline-none focus:ring-3 focus:ring-[var(--ring)] disabled:opacity-60';
+  'rounded-xl border border-line bg-surface-2 px-3.5 text-[13px] text-fg placeholder:text-fg-3 transition-colors focus:border-brand focus:bg-surface focus:outline-none focus:ring-3 focus:ring-[var(--ring)] disabled:opacity-60';
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...rest }, ref) {
-  return <input ref={ref} className={cn(control, 'h-9', className)} {...rest} />;
+  return <input ref={ref} className={cn(control, widthOf(className), 'h-10', className)} {...rest} />;
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea({ className, ...rest }, ref) {
-  return <textarea ref={ref} className={cn(control, 'py-2 leading-relaxed', className)} {...rest} />;
+  return <textarea ref={ref} className={cn(control, widthOf(className), 'py-2 leading-relaxed', className)} {...rest} />;
 });
 
 export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(function Select({ className, children, ...rest }, ref) {
   return (
-    <select ref={ref} className={cn(control, 'h-9 pr-8 appearance-none bg-[length:16px] bg-[right_8px_center] bg-no-repeat', className)} style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237b8087' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")" }} {...rest}>
+    <select ref={ref} className={cn(control, widthOf(className), 'h-10 pr-8 appearance-none bg-[length:16px] bg-[right_8px_center] bg-no-repeat', className)} style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237b8087' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")" }} {...rest}>
       {children}
     </select>
   );
@@ -182,8 +190,8 @@ export function SkeletonList({ rows = 4 }: { rows?: number }) {
 export function EmptyState({ icon: Icon, title, children, action, compact }: { icon: LucideIcon; title: string; children?: ReactNode; action?: ReactNode; compact?: boolean }) {
   return (
     <div className={cn('flex flex-col items-center text-center', compact ? 'px-4 py-8' : 'px-6 py-14')}>
-      <div className="mb-3 flex size-10 items-center justify-center rounded-xl border border-line bg-surface-2">
-        <Icon className="size-5 text-fg-3" aria-hidden />
+      <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-brand-soft">
+        <Icon className="size-5 text-brand-text" aria-hidden />
       </div>
       <h3 className="text-[14px] font-semibold text-fg">{title}</h3>
       {children && <div className="mt-1 max-w-sm text-[13px] text-fg-3">{children}</div>}
@@ -213,7 +221,7 @@ export function PageHeader({ title, description, actions, eyebrow }: { title: Re
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         {eyebrow && <div className="mb-1 text-[12px] font-medium text-fg-3">{eyebrow}</div>}
-        <h1 className="text-[22px] font-semibold tracking-[-0.015em] text-fg">{title}</h1>
+        <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-fg">{title}</h1>
         {description && <p className="mt-1 max-w-2xl text-[13.5px] text-fg-2">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -223,7 +231,7 @@ export function PageHeader({ title, description, actions, eyebrow }: { title: Re
 
 export function Tabs<T extends string>({ tabs, value, onChange, className }: { tabs: { id: T; label: string; count?: number }[]; value: T; onChange: (v: T) => void; className?: string }) {
   return (
-    <div role="tablist" className={cn('flex gap-1 overflow-x-auto border-b border-line', className)}>
+    <div role="tablist" className={cn('no-scrollbar flex w-fit max-w-full gap-1 overflow-x-auto rounded-full border border-line bg-surface p-1', className)}>
       {tabs.map((t) => (
         <button
           key={t.id}
@@ -231,12 +239,14 @@ export function Tabs<T extends string>({ tabs, value, onChange, className }: { t
           aria-selected={value === t.id}
           onClick={() => onChange(t.id)}
           className={cn(
-            '-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-[13px] font-medium whitespace-nowrap transition-colors',
-            value === t.id ? 'border-brand text-fg' : 'border-transparent text-fg-3 hover:text-fg-2',
+            'flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12.5px] font-medium whitespace-nowrap transition-colors',
+            value === t.id ? 'bg-brand text-white dark:text-[#120d2b]' : 'text-fg-3 hover:bg-surface-2 hover:text-fg-2',
           )}
         >
           {t.label}
-          {t.count !== undefined && <span className="rounded bg-surface-2 px-1.5 text-[11px] text-fg-3">{t.count}</span>}
+          {t.count !== undefined && (
+            <span className={cn('rounded-full px-1.5 text-[10.5px]', value === t.id ? 'bg-white/20' : 'bg-surface-2 text-fg-3')}>{t.count}</span>
+          )}
         </button>
       ))}
     </div>
@@ -245,16 +255,16 @@ export function Tabs<T extends string>({ tabs, value, onChange, className }: { t
 
 export function Segmented<T extends string>({ options, value, onChange, size = 'md' }: { options: { id: T; label: string }[]; value: T; onChange: (v: T) => void; size?: 'sm' | 'md' }) {
   return (
-    <div className="inline-flex rounded-lg border border-line bg-surface-2 p-0.5">
+    <div className="inline-flex rounded-full border border-line bg-surface p-1">
       {options.map((o) => (
         <button
           key={o.id}
           onClick={() => onChange(o.id)}
           aria-pressed={value === o.id}
           className={cn(
-            'rounded-md font-medium transition-colors',
-            size === 'sm' ? 'px-2 py-1 text-[12px]' : 'px-3 py-1.5 text-[12.5px]',
-            value === o.id ? 'bg-surface text-fg shadow-card' : 'text-fg-3 hover:text-fg-2',
+            'rounded-full font-medium transition-colors',
+            size === 'sm' ? 'px-2.5 py-1 text-[12px]' : 'px-3.5 py-1.5 text-[12.5px]',
+            value === o.id ? 'bg-brand-soft text-brand-text' : 'text-fg-3 hover:text-fg-2',
           )}
         >
           {o.label}
@@ -292,9 +302,42 @@ export function Stat({ label, value, hint, tone, icon: Icon }: { label: string; 
         {Icon && <Icon className="size-3.5" aria-hidden />}
         {label}
       </div>
-      <div className={cn('mt-1 text-[24px] font-semibold tracking-tight tabular-nums', color)}>{value}</div>
+      <div className={cn('mt-1 text-[26px] font-semibold tracking-tight tabular-nums', color)}>{value}</div>
       {hint && <div className="text-[12px] text-fg-3">{hint}</div>}
     </div>
+  );
+}
+
+/** Round, soft icon button (the meeting-room control style). */
+export function RoundButton({ icon: Icon, label, onClick, active, tone = 'default', className, disabled }: { icon: LucideIcon; label: string; onClick?: () => void; active?: boolean; tone?: 'default' | 'brand'; className?: string; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'flex size-12 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-50',
+        active || tone === 'brand' ? 'bg-brand-soft text-brand-text hover:brightness-95' : 'bg-surface-2 text-fg-2 hover:bg-surface-3',
+        className,
+      )}
+    >
+      <Icon className="size-5" aria-hidden />
+    </button>
+  );
+}
+
+/** Title with one highlighted word, e.g. "Weekly product <sync>". */
+export function HighlightTitle({ text, highlight, className }: { text: string; highlight?: string | null; className?: string }) {
+  const i = highlight ? text.toLowerCase().indexOf(highlight.toLowerCase()) : -1;
+  if (!highlight || i < 0) return <span className={className}>{text}</span>;
+  return (
+    <span className={className}>
+      {text.slice(0, i)}
+      <span className="text-brand-text">{text.slice(i, i + highlight.length)}</span>
+      {text.slice(i + highlight.length)}
+    </span>
   );
 }
 
@@ -323,7 +366,7 @@ export function Modal({
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] dark:bg-black/60" />
         <Dialog.Content
           className={cn(
-            'fixed top-1/2 left-1/2 z-50 flex max-h-[90vh] w-[calc(100vw-24px)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl border border-line bg-surface shadow-pop focus:outline-none',
+            'fixed top-1/2 left-1/2 z-50 flex max-h-[90vh] w-[calc(100vw-24px)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-[24px] border border-line bg-surface shadow-pop focus:outline-none',
             wide ? 'max-w-2xl' : 'max-w-lg',
           )}
         >
@@ -341,7 +384,7 @@ export function Modal({
             </Dialog.Close>
           </div>
           <div className="overflow-y-auto px-5 py-4">{children}</div>
-          {footer && <div className="flex justify-end gap-2 border-t border-line bg-surface-2/50 px-5 py-3 rounded-b-2xl">{footer}</div>}
+          {footer && <div className="flex justify-end gap-2 border-t border-line bg-surface-2/50 px-5 py-3 rounded-b-[24px]">{footer}</div>}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -355,7 +398,7 @@ export function Menu({ trigger, items, align = 'end' }: { trigger: ReactNode; it
     <DM.Root>
       <DM.Trigger asChild>{trigger}</DM.Trigger>
       <DM.Portal>
-        <DM.Content align={align} sideOffset={6} className="z-50 min-w-48 rounded-xl border border-line bg-surface p-1 shadow-pop">
+        <DM.Content align={align} sideOffset={6} className="z-50 min-w-48 rounded-2xl border border-line bg-surface p-1.5 shadow-pop">
           {items.map((it, i) =>
             it === 'separator' ? (
               <DM.Separator key={i} className="my-1 h-px bg-line" />
@@ -365,7 +408,7 @@ export function Menu({ trigger, items, align = 'end' }: { trigger: ReactNode; it
                 disabled={it.disabled}
                 onSelect={it.onSelect}
                 className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] outline-none data-[disabled]:opacity-50 data-[highlighted]:bg-surface-2',
+                  'flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-[13px] outline-none data-[disabled]:opacity-50 data-[highlighted]:bg-surface-2',
                   it.danger ? 'text-danger' : 'text-fg',
                 )}
               >

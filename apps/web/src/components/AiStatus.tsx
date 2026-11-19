@@ -53,21 +53,19 @@ export function AiStatusPill() {
   return (
     <Link
       to="/app/settings?tab=ai"
-      title={plan.detail}
-      className="flex items-center gap-2 rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] shadow-card transition-colors hover:border-line-strong"
+      title={`${plan.label} — ${plan.detail}`}
+      aria-label={`AI: ${availability === null ? 'checking' : plan.label}. Open AI & privacy settings`}
+      className="flex h-10 items-center gap-2 rounded-full border border-line bg-surface pr-1.5 pl-1.5 text-[12px] transition-colors hover:border-line-strong lg:pr-3.5"
     >
       <span
         className={cn(
-          'flex size-6 items-center justify-center rounded-md',
+          'flex size-7 items-center justify-center rounded-full',
           plan.tone === 'device' ? 'bg-device-soft text-device' : plan.tone === 'cloud' ? 'bg-cloud-soft text-cloud' : 'bg-warning-soft text-warning',
         )}
       >
         <Icon className="size-3.5" aria-hidden />
       </span>
-      <span className="min-w-0 flex-1">
-        <span className="block font-medium text-fg">{availability === null ? 'Checking AI…' : plan.label}</span>
-        <span className="block text-[11px] text-fg-3">AI & privacy settings</span>
-      </span>
+      <span className="hidden font-medium whitespace-nowrap text-fg lg:block">{availability === null ? 'Checking AI…' : plan.label}</span>
     </Link>
   );
 }

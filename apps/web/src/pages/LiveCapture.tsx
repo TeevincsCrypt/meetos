@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
-import { AlertTriangle, ClipboardPaste, Info, Mic, MicOff, Pause, Play, ShieldCheck, Square } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardPaste, Info, Languages, Mic, MicOff, Pause, Pin, ShieldCheck, Users } from 'lucide-react';
 import type { Meeting } from '@meetos/shared';
 import { useSession } from '@/state/auth';
 import { useWs } from '@/state/workspace';
 import { appendSegment, getSegments, getTranscript, listenMeeting, patchMeeting, saveTranscript, segmentsToTranscript } from '@/data/meetings';
-import { Avatar, Button, ButtonLink, Card, cn, ErrorNote, Field, Notice, PageHeader, Select, Skeleton } from '@/components/ui';
+import { Avatar, Badge, Button, ButtonLink, Card, cn, ErrorNote, Field, Notice, PageHeader, RoundButton, Select, Skeleton } from '@/components/ui';
+import { MeetingHeader } from '@/components/MeetingHeader';
+import { fmtDate } from '@/lib/format';
 import { Timestamp, serverTimestamp } from 'firebase/firestore';
 
 // Minimal typings for the Web Speech API (not in TypeScript's DOM lib).
@@ -36,6 +38,7 @@ interface Segment {
   index: number;
   speaker: string | null;
   text: string;
+  at?: number;
 }
 
 type Phase = 'consent' | 'recording' | 'paused' | 'saving';
@@ -142,7 +145,7 @@ export default function LiveCapturePage() {
         const text = r[0].transcript.trim();
         if (r.isFinal) {
           if (!text) continue;
-          const seg: Segment = { index: indexRef.current++, speaker: speakerRef.current, text: text.charAt(0).toUpperCase() + text.slice(1) };
+          const seg: Segment = { index: indexRef.current++, speaker: speakerRef.current, text: text.charAt(0).toUpperCase() + text.slice(1), at: Date.now() };
           setSegments((s) => [...s, seg]);
           // Incremental save: each finalised phrase is written immediately.
           appendSegment(wid, id, { ...seg, source: 'web_speech' }).catch(() => setSaveErrors((n) => n + 1));
@@ -254,110 +257,214 @@ export default function LiveCapturePage() {
   }
 
   const active = phase === 'recording' || phase === 'paused' || phase === 'saving';
+  const latest = [...segments].reverse().find((x) => x.text);
+  const stageSpeaker = speaker ?? latest?.speaker ?? null;
+  const others = speakerOptions.filter((n) => n !== stageSpeaker);
+  const clock = (ms?: number) => (ms ? new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
+
+  const header = (
+    <MeetingHeader
+      title={meeting.title}
+      subtitle={meeting.description || 'Live transcription with consent'}
+      topLeft={
+        active ? (
+          <Badge tone="success" icon={CheckCircle2}>Consent confirmed</Badge>
+        ) : (
+          <Badge tone="neutral" icon={ShieldCheck}>Consent required</Badge>
+        )
+      }
+      topRight={<Badge tone="brand" icon={Users}>{speakerOptions.length} participants</Badge>}
+      bottomLeft={{ label: 'Meet date', value: fmtDate(meeting.startedAt ?? meeting.scheduledAt ?? Date.now(), true) }}
+      bottomRight={{
+        label: 'Recording time',
+        value: (
+          <>
+            <span className={cn('size-3 rounded-full', phase === 'recording' ? 'rec-dot bg-danger' : 'bg-fg-3/40')} aria-hidden />
+            <span className="font-mono">{elapsed}</span>
+          </>
+        ),
+      }}
+    />
+  );
+
+  const participantsCard = (
+    <Card>
+      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+        <h2 className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.01em] text-fg">
+          Participants <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-semibold text-white dark:text-[#120d2b]">{speakerOptions.length}</span>
+        </h2>
+      </div>
+      {speakerOptions.length === 0 ? (
+        <p className="px-5 pb-5 text-[13px] text-fg-3">No participants listed. Speech will be saved without speaker labels.</p>
+      ) : (
+        <ul className="border-t border-line pb-2">
+          {speakerOptions.map((n) => {
+            const current = speaker === n;
+            return (
+              <li key={n} className={cn('flex items-center gap-3 px-5 py-2.5', current && 'bg-surface-2')}>
+                <Avatar name={n} size={36} />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13.5px] font-medium text-fg">{n}</div>
+                  <div className={cn('text-[11.5px]', current ? 'text-brand-text' : 'text-fg-3')}>{current ? 'Speaking now' : 'Participant'}</div>
+                </div>
+                <button
+                  type="button"
+                  disabled={!active}
+                  onClick={() => setSpeaker(current ? null : n)}
+                  aria-pressed={current}
+                  aria-label={current ? `Unpin ${n} as current speaker` : `Set ${n} as current speaker`}
+                  title={current ? 'Current speaker' : 'Set as current speaker'}
+                  className={cn('flex size-9 items-center justify-center rounded-full transition-colors disabled:opacity-40', current ? 'bg-brand-soft text-brand-text' : 'text-fg-3 hover:bg-surface-3')}
+                >
+                  <Pin className="size-4" aria-hidden />
+                </button>
+                <span className={cn('flex size-9 items-center justify-center rounded-full', current && phase === 'recording' ? 'bg-brand-soft text-brand-text' : 'text-fg-3')} aria-hidden>
+                  {current && phase === 'recording' ? <Mic className="size-4" /> : <MicOff className="size-4" />}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Card>
+  );
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
       {active && (
-        <div
-          role="status"
-          aria-live="polite"
-          className={cn(
-            'sticky top-14 z-10 -mx-4 mb-4 flex items-center gap-3 border-b px-4 py-2.5 sm:-mx-6 sm:px-6',
-            phase === 'recording' ? 'border-danger/30 bg-danger-soft' : 'border-line bg-surface-2',
-          )}
-        >
-          <span className={cn('size-2.5 rounded-full', phase === 'recording' ? 'rec-dot bg-danger' : 'bg-fg-3')} aria-hidden />
-          <span className={cn('text-[13px] font-semibold', phase === 'recording' ? 'text-danger' : 'text-fg-2')}>
-            {phase === 'recording' ? 'Recording' : phase === 'saving' ? 'Saving…' : 'Paused'}
-          </span>
-          <span className="font-mono text-[13px] text-fg-2 tabular-nums">{elapsed}</span>
-          <span className="ml-auto hidden text-[12px] text-fg-3 sm:block">{segments.length} segments saved</span>
+        <div role="status" aria-live="polite" className="sr-only">
+          {phase === 'recording' ? 'Recording' : phase === 'saving' ? 'Saving' : 'Paused'}
         </div>
       )}
+      <div className="min-w-0 space-y-5">
+        <h2 className="sr-only">Live capture</h2>
+        {header}
 
-      <PageHeader title="Live capture" eyebrow={meeting.title} />
-
-      {phase === 'consent' && (
-        <Card className="p-6">
-          <div className="flex items-center gap-2 text-[15px] font-semibold text-fg">
-            <ShieldCheck className="size-5 text-brand" aria-hidden /> Before you record
-          </div>
-          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[13.5px] text-fg-2">
-            <li>Tell everyone in the meeting that it's being transcribed, and get their agreement. Recording laws differ by location.</li>
-            <li>MEETOS stores the <strong className="text-fg">text</strong> transcript in this workspace. Audio is not stored.</li>
-            <li>
-              Transcription is performed by your browser's built-in speech recognition (Web Speech API). In Chrome, audio is sent to Google's speech service to be converted to text.
-            </li>
-            <li>AI analysis runs only when you start it afterwards, and shows whether it ran on this device or in the cloud.</li>
-          </ul>
-          {existingTranscript && (
-            <Notice tone="warning" icon={Info} className="mt-4">This meeting already has a transcript. New speech will be appended to it.</Notice>
-          )}
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Spoken language" htmlFor="lang">
-              <Select id="lang" value={lang} onChange={(e) => setLang(e.target.value)}>
-                {LANGS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </Select>
-            </Field>
-          </div>
-          <label className="mt-5 flex cursor-pointer items-start gap-2.5 rounded-lg border border-line bg-surface-2/60 p-3">
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 size-4 accent-[var(--brand)]" />
-            <span className="text-[13.5px] text-fg">Everyone in this meeting knows it is being transcribed and has agreed.</span>
-          </label>
-          <div className="mt-5 flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => navigate(`/app/meetings/${id}`)}>Cancel</Button>
-            <Button variant="primary" icon={Mic} disabled={!consent} onClick={() => void start()}>Start recording</Button>
-          </div>
-        </Card>
-      )}
-
-      {active && (
-        <>
-          {speakerOptions.length > 0 && (
-            <Card className="mb-4 p-4">
-              <div className="mb-2 text-[12px] font-medium text-fg-3">Who is speaking? Speech recognition can't tell voices apart — tap the current speaker so commitments are attributed correctly.</div>
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => setSpeaker(null)} className={cn('rounded-full border px-3 py-1 text-[12.5px]', speaker === null ? 'border-brand bg-brand-soft text-brand-text' : 'border-line text-fg-2 hover:border-line-strong')}>
-                  Unlabelled
-                </button>
-                {speakerOptions.map((n) => (
-                  <button key={n} onClick={() => setSpeaker(n)} className={cn('inline-flex items-center gap-1.5 rounded-full border py-1 pr-3 pl-1 text-[12.5px]', speaker === n ? 'border-brand bg-brand-soft text-brand-text' : 'border-line text-fg-2 hover:border-line-strong')}>
-                    <Avatar name={n} size={20} /> {n}
-                  </button>
-                ))}
-              </div>
-            </Card>
-          )}
-
-          <Card>
-            <div ref={listRef} className="max-h-[50vh] min-h-56 space-y-2 overflow-y-auto p-5" aria-live="polite">
-              {segments.length === 0 && !interim && <p className="text-[13.5px] text-fg-3">{phase === 'recording' ? 'Listening… start speaking.' : 'Paused.'}</p>}
-              {segments.map((s) => (
-                <p key={s.index} className="text-[14px] leading-relaxed text-fg">
-                  {s.speaker && <span className="font-semibold">{s.speaker}: </span>}
-                  {s.text}
-                </p>
-              ))}
-              {interim && <p className="text-[14px] leading-relaxed text-fg-3 italic">{interim}</p>}
+        {phase === 'consent' ? (
+          <Card className="p-6">
+            <div className="flex items-center gap-2 text-[16px] font-semibold text-fg">
+              <span className="flex size-8 items-center justify-center rounded-full bg-brand-soft text-brand-text"><ShieldCheck className="size-4" aria-hidden /></span>
+              Before you record
             </div>
-            <div className="flex flex-wrap items-center gap-2 border-t border-line p-3">
-              {phase === 'recording' ? (
-                <Button icon={Pause} onClick={pause}>Pause</Button>
-              ) : (
-                <Button icon={Play} onClick={resume} disabled={phase === 'saving'}>Resume</Button>
-              )}
-              <Button variant="danger" icon={Square} loading={phase === 'saving'} onClick={() => void stop()}>Stop & save</Button>
-              <span className="ml-auto text-[12px] text-fg-3">Source: browser speech recognition</span>
+            <ul className="mt-4 space-y-2 text-[13px] text-fg-2">
+              <li className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" aria-hidden />Tell everyone in the meeting that it's being transcribed, and get their agreement. Recording laws differ by location.</li>
+              <li className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" aria-hidden /><span>MEETOS stores the <strong className="text-fg">text</strong> transcript in this workspace. Audio is not stored.</span></li>
+              <li className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" aria-hidden />Transcription is performed by your browser's built-in speech recognition (Web Speech API). In Chrome, audio is sent to Google's speech service to be converted to text.</li>
+              <li className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" aria-hidden />AI analysis runs only when you start it afterwards, and shows whether it ran on this device or in the cloud.</li>
+            </ul>
+            {existingTranscript && (
+              <Notice tone="warning" icon={Info} className="mt-4">This meeting already has a transcript. New speech will be appended to it.</Notice>
+            )}
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field label="Spoken language" htmlFor="lang">
+                <Select id="lang" value={lang} onChange={(e) => setLang(e.target.value)}>
+                  {LANGS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </Select>
+              </Field>
+            </div>
+            <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface-2 p-4">
+              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 size-4 accent-[var(--brand)]" />
+              <span className="text-[13.5px] text-fg">Everyone in this meeting knows it is being transcribed and has agreed.</span>
+            </label>
+            <div className="mt-5 flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => navigate(`/app/meetings/${id}`)}>Cancel</Button>
+              <Button variant="primary" icon={Mic} disabled={!consent} onClick={() => void start()}>Start recording</Button>
             </div>
           </Card>
-          {saveErrors > 0 && (
-            <Notice tone="warning" icon={AlertTriangle} className="mt-3">
-              {saveErrors} segment{saveErrors === 1 ? '' : 's'} could not be saved immediately. They're kept on this page and will be included when you stop.
-            </Notice>
-          )}
-        </>
-      )}
-      {error && <ErrorNote className="mt-4">{error}</ErrorNote>}
+        ) : (
+          <>
+            {/* Stage: the current speaker and what they just said. */}
+            <Card className="p-3">
+              <div className="relative flex min-h-72 flex-col items-center justify-center overflow-hidden rounded-2xl border border-brand/15 bg-gradient-to-b from-surface-2 to-surface px-6 py-10 text-center">
+                <span className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full bg-surface/90 py-1 pr-3 pl-1 text-[12.5px] font-medium text-fg shadow-card">
+                  {stageSpeaker ? <Avatar name={stageSpeaker} size={22} /> : <span className="size-[22px] rounded-full bg-surface-3" />}
+                  {stageSpeaker ?? 'Unlabelled speaker'}
+                </span>
+                <span className={cn('absolute top-4 right-4 flex size-10 items-center justify-center rounded-full', phase === 'recording' ? 'bg-brand-soft text-brand-text' : 'bg-surface-2 text-fg-3')} aria-hidden>
+                  {phase === 'recording' ? <Mic className="size-[18px]" /> : <MicOff className="size-[18px]" />}
+                </span>
+                {stageSpeaker ? <Avatar name={stageSpeaker} size={96} /> : (
+                  <span className="flex size-24 items-center justify-center rounded-full bg-surface-3 text-fg-3"><Mic className="size-8" aria-hidden /></span>
+                )}
+                <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-fg" aria-live="polite">
+                  {interim ? <span className="text-fg-3 italic">{interim}</span> : latest ? `“${latest.text}”` : phase === 'recording' ? 'Listening… start speaking.' : 'Paused.'}
+                </p>
+              </div>
+              {others.length > 0 && (
+                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {others.slice(0, 2).map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setSpeaker(n)}
+                      aria-label={`Set ${n} as current speaker`}
+                      className="relative flex h-32 flex-col items-center justify-center rounded-2xl bg-surface-2 transition-colors hover:bg-surface-3"
+                    >
+                      <Avatar name={n} size={52} />
+                      <span className="absolute bottom-2.5 left-2.5 rounded-full bg-surface/90 px-2.5 py-0.5 text-[12px] font-medium text-fg">{n}</span>
+                      <span className="absolute top-2.5 right-2.5 flex size-7 items-center justify-center rounded-full bg-surface/90 text-fg-3" aria-hidden><MicOff className="size-3.5" /></span>
+                    </button>
+                  ))}
+                  <div className="relative hidden h-32 flex-col items-center justify-center rounded-2xl bg-surface-2 sm:flex">
+                    <span className="flex items-center gap-1.5 rounded-full bg-surface/90 px-3 py-1.5 text-[14px] font-semibold text-fg"><Users className="size-4 text-fg-3" aria-hidden />{speakerOptions.length}</span>
+                    <span className="mt-1.5 text-[11.5px] text-fg-3">{segments.length} segments saved</span>
+                  </div>
+                </div>
+              )}
+            </Card>
+
+            {/* Control bar */}
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+              <div><RoundButton icon={Languages} label={`Language: ${lang}`} disabled /></div>
+              <div className="flex items-center gap-3">
+                {phase === 'recording' ? (
+                  <RoundButton icon={Pause} label="Pause" tone="brand" onClick={pause} />
+                ) : (
+                  <RoundButton icon={Mic} label="Resume" onClick={resume} disabled={phase === 'saving'} />
+                )}
+                <Button variant="danger" size="lg" className="min-w-36 justify-center" loading={phase === 'saving'} onClick={() => void stop()}>
+                  {phase === 'saving' ? 'Saving' : 'End & save'}
+                </Button>
+              </div>
+              <span className="hidden text-right text-[12px] text-fg-3 sm:block">Browser speech recognition</span>
+            </div>
+            {saveErrors > 0 && (
+              <Notice tone="warning" icon={AlertTriangle}>
+                {saveErrors} segment{saveErrors === 1 ? '' : 's'} could not be saved immediately. They're kept on this page and will be included when you stop.
+              </Notice>
+            )}
+          </>
+        )}
+        {error && <ErrorNote>{error}</ErrorNote>}
+      </div>
+
+      <div className="min-w-0 space-y-5">
+        {participantsCard}
+        <Card className="flex flex-col">
+          <div className="px-5 pt-5 pb-3">
+            <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-fg">Live transcript</h2>
+            <p className="text-[12px] text-fg-3">Each phrase is saved to the workspace as it's recognised.</p>
+          </div>
+          <div ref={listRef} className="max-h-[52vh] min-h-60 space-y-3 overflow-y-auto border-t border-line px-4 py-4" aria-live="polite">
+            {segments.length === 0 && !interim && (
+              <p className="py-8 text-center text-[13px] text-fg-3">{active ? 'Nothing captured yet.' : 'The transcript will appear here once you start.'}</p>
+            )}
+            {segments.map((s) => (
+              <div key={s.index} className="ml-auto max-w-[92%] overflow-hidden rounded-2xl rounded-tr-md border border-line bg-surface">
+                <div className="flex items-center justify-end gap-2 bg-brand-soft/70 px-3 py-1.5 text-[11px] text-brand-text">
+                  {s.at && <span>{clock(s.at)}</span>}
+                  <span className="font-medium">• {s.speaker ?? 'Unlabelled'}</span>
+                  {s.speaker && <Avatar name={s.speaker} size={18} />}
+                </div>
+                <p className="px-3 py-2 text-right text-[13px] leading-relaxed text-fg-2">{s.text}</p>
+              </div>
+            ))}
+            {interim && (
+              <div className="mr-auto max-w-[92%] rounded-2xl rounded-tl-md bg-surface-2 px-3 py-2 text-[13px] text-fg-3 italic">{interim}</div>
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }

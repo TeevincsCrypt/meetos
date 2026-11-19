@@ -104,14 +104,15 @@ pnpm dev
 
 ### Deploy on Vercel (recommended for testing)
 
-`apps/web/vercel.json` already contains the build settings, the single-page-app fallback
+`vercel.json` (repo root) already contains the build settings, the single-page-app fallback
 (so links like `/app/meetings/123` work on refresh) and security headers, including the
 microphone permission that live capture needs.
 
 1. **Import the repo:** vercel.com → **Add New… → Project** → import your GitHub repository.
-2. **Root Directory:** click **Edit** and choose `apps/web`. Leave **"Include files outside
-   the root directory in the Build Step"** enabled — the app uses `packages/shared`.
-   Framework, install/build commands and output directory are read from `vercel.json`.
+2. **Root Directory:** leave it as the repository root (`./`). The root `vercel.json` builds
+   `apps/web` and serves `apps/web/dist`. (If you prefer to set Root Directory to `apps/web`,
+   that works too — `apps/web/vercel.json` is used instead; keep "Include files outside the
+   root directory in the Build Step" enabled.)
 3. **Environment variables** (Settings → Environment Variables, for Production and Preview):
 
    | Name | Value |

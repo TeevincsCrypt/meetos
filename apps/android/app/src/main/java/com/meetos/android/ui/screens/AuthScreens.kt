@@ -1,6 +1,9 @@
 package com.meetos.android.ui.screens
 
 import android.app.Activity
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.meetos.android.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,20 +29,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.meetos.android.auth.AuthRepository
 import com.meetos.android.ui.AppViewModel
 import com.meetos.android.ui.Muted
 import com.meetos.android.ui.SectionCard
 import kotlinx.coroutines.launch
 
+/** Official logo (res/drawable-nodpi/meetos_logo.png; a light-text variant lives in drawable-night-nodpi). */
 @Composable
 private fun Brand() {
-    Text("MEETOS", fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+    Image(
+        painter = painterResource(R.drawable.meetos_logo),
+        contentDescription = "Meetos",
+        modifier = Modifier.height(36.dp),
+    )
 }
 
 @Composable

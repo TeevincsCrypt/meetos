@@ -55,7 +55,8 @@ const PEOPLE = [
 /** An illustrative composition of MEETOS screens (fictional sample names). */
 function ProductPreview() {
   return (
-    <div className="rounded-[28px] border border-line bg-surface/70 p-2 shadow-pop backdrop-blur sm:p-3" aria-label="Preview of a MEETOS meeting room" role="img">
+    <div className="relative rounded-[28px] border border-line bg-surface/70 p-2 shadow-pop backdrop-blur sm:p-3" aria-label="Preview of a Meetos meeting room" role="img">
+      <div className="bg-logo-gradient absolute inset-x-10 -top-px h-px opacity-80" aria-hidden />
       <div className="flex items-center gap-1.5 px-3 pt-1.5 pb-3">
         <span className="size-2.5 rounded-full bg-[#ff5f57]" />
         <span className="size-2.5 rounded-full bg-[#febc2e]" />
@@ -279,7 +280,7 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
               Hybrid AI · on-device first with Firebase AI Logic
             </span>
             <h1 className="mt-6 text-[38px] leading-[1.08] font-semibold tracking-[-0.03em] text-fg sm:text-[56px]">
-              Meetings shouldn't end with notes. They should end with <span className="text-brand-text">work getting done.</span>
+              Meetings shouldn't end with notes. They should end with <span className="text-logo-gradient">work getting done.</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-[16px] leading-relaxed text-fg-2">
               MEETOS turns conversations into decisions, commitments, owners and deadlines — then follows every commitment

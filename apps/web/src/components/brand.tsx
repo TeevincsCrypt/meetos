@@ -1,22 +1,20 @@
 import { cn } from './ui';
 
+/**
+ * Official MEETOS logo (supplied artwork, cut out to transparent PNG/WebP in
+ * public/brand). Two lockups follow the app theme: the dark variant has a
+ * light "Meet" so it stays legible on dark surfaces.
+ */
 export function LogoMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" className={cn('size-8', className)} aria-hidden>
-      <rect width="32" height="32" rx="10" fill="var(--brand)" />
-      <circle cx="10" cy="11.5" r="3" fill="#fff" />
-      <circle cx="22" cy="11.5" r="3" fill="#fff" fillOpacity=".6" />
-      <circle cx="16" cy="21.5" r="3" fill="#ffd27a" />
-      <path d="M10 11.5 16 21.5 22 11.5" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeOpacity=".85" />
-    </svg>
-  );
+  return <img src="/brand/meetos-mark-sm.webp" alt="Meetos" width={160} height={117} className={cn('h-8 w-auto select-none', className)} draggable={false} />;
 }
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, size = 'md' }: { className?: string; size?: 'md' | 'lg' }) {
+  const h = size === 'lg' ? 'h-10' : 'h-8';
   return (
-    <span className={cn('inline-flex items-center gap-2', className)}>
-      <LogoMark />
-      <span className="text-[17px] font-semibold tracking-[0.04em] text-fg">MEETOS</span>
+    <span className={cn('inline-flex items-center', className)}>
+      <img src="/brand/meetos-logo-sm.webp" alt="Meetos" width={560} height={137} className={cn(h, 'w-auto select-none dark:hidden')} draggable={false} />
+      <img src="/brand/meetos-logo-dark-sm.webp" alt="Meetos" width={560} height={137} className={cn(h, 'hidden w-auto select-none dark:block')} draggable={false} />
     </span>
   );
 }

@@ -74,7 +74,7 @@ function EditMeetingModal({ meeting, open, onOpenChange }: { meeting: Meeting; o
         }}
       >
         <Field label="Title" htmlFor="e-title"><Input id="e-title" required value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Date & time" htmlFor="e-when"><Input id="e-when" type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} /></Field>
           <Field label="Project" htmlFor="e-project"><ProjectSelect id="e-project" value={projectId} onChange={setProjectId} /></Field>
         </div>
@@ -314,7 +314,7 @@ export default function MeetingDetailPage() {
       />
 
       {tab === 'overview' && (
-        <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <div className="space-y-6">
             {hasTranscript ? (
               <AnalyzePanel meeting={meeting} transcript={transcript.text} autoFocus={params.get('analyze') === '1'} />
@@ -374,7 +374,10 @@ export default function MeetingDetailPage() {
                   {meeting.participants.map((p) => (
                     <li key={p.name} className="flex items-center gap-2 text-[13.5px] text-fg">
                       <Avatar name={p.name} size={24} /> {p.name}
-                      <span className="ml-auto text-[12px] text-fg-3">{commitments.filter((c) => c.ownerName === p.name && c.meetingIds.includes(meeting.id)).length || ''}</span>
+                      {(() => {
+                        const n = commitments.filter((c) => c.ownerName === p.name && c.meetingIds.includes(meeting.id)).length;
+                        return n ? <span className="ml-auto text-[12px] text-fg-3">{n} commitment{n === 1 ? '' : 's'}</span> : null;
+                      })()}
                     </li>
                   ))}
                 </ul>

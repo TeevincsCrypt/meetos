@@ -44,9 +44,10 @@ service cloud.firestore {
     // ------------------------------------------------------------------ users
     match /users/{userId} {
       allow read, delete: if signedIn() && me() == userId;
+      // Fields are validated when present, so partial (merge) writes work.
       allow create, update: if signedIn() && me() == userId
-        && isStr(request.resource.data.displayName, 120)
-        && optStr(request.resource.data.lastWorkspaceId, 128);
+        && optStr(request.resource.data.get('displayName', null), 120)
+        && optStr(request.resource.data.get('lastWorkspaceId', null), 128);
     }
 
     // ------------------------------------------------------------- invites (collection group)

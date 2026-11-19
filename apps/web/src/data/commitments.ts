@@ -83,6 +83,8 @@ export interface NewCommitment {
   evidence: Evidence[];
   origin: 'ai' | 'manual';
   inferenceSource: InferenceSourceLabel | null;
+  /** When the promise was made (meeting time). Defaults to now. */
+  madeAt?: number;
 }
 
 /** Writes a new commitment + its "created" event into `b`. Returns the id. */
@@ -125,6 +127,7 @@ export function stageCommitment(b: WriteBatch, wid: string, actor: Actor, c: New
     quote: c.evidence[0]?.quote ?? null,
     note: c.origin === 'ai' ? `Extracted from the transcript (${sourceText(c.inferenceSource)}).` : 'Added manually.',
     origin: c.origin === 'manual' ? 'user' : 'ai',
+    at: c.madeAt,
   });
   return id;
 }

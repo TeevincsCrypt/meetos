@@ -275,6 +275,7 @@ async function persistAnalysis(a: {
         evidence: [evidenceOf(meeting, c.evidence)],
         origin: 'ai',
         inferenceSource: c.source,
+        madeAt: meetingDate,
       }),
     );
   }

@@ -281,7 +281,7 @@ function ProjectsTab() {
             setEditing(null);
           }}
         >
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Name" htmlFor="pr-name"><Input id="pr-name" required value={editing.name ?? ''} onChange={(e) => setEditing({ ...editing, name: e.target.value })} /></Field>
             <Field label="Colour" htmlFor="pr-color">
               <div className="flex gap-1.5 pt-1.5">

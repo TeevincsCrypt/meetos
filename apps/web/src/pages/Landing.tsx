@@ -92,7 +92,7 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 pt-10 pb-20 lg:grid-cols-[1.05fr_1fr] lg:pt-16">
+      <section className="mx-auto grid grid-cols-1 max-w-6xl items-center gap-12 px-5 pt-10 pb-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:pt-16">
         <div>
           <Badge tone="device" icon={Cpu}>Hybrid AI · on-device first with Firebase AI Logic</Badge>
           <h1 className="mt-5 text-[40px] leading-[1.08] font-semibold tracking-[-0.03em] text-fg sm:text-[52px]">
@@ -122,7 +122,7 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
       <section id="how" className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-16">
           <h2 className="text-[26px] font-semibold tracking-tight text-fg">From conversation to accountability</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
               { n: '1', icon: FileText, t: 'Capture', d: 'Record live with consent, or import a transcript. Speaker names come from the transcript — never invented.' },
               { n: '2', icon: Cpu, t: 'Extract', d: 'Short transcript chunks are analysed on your device when supported, in the cloud otherwise. Every result is checked against the transcript before it is saved.' },
@@ -142,7 +142,7 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
       </section>
 
       <section className="mx-auto max-w-6xl px-5 py-16">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <div key={f.title} className="rounded-xl border border-line bg-surface p-5 shadow-card">
               <f.icon className="size-5 text-brand" aria-hidden />
@@ -154,7 +154,7 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
       </section>
 
       <section className="border-t border-line bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-2">
+        <div className="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-5 py-16 lg:grid-cols-2">
           <div>
             <h2 className="text-[26px] font-semibold tracking-tight text-fg">Private by design, honest about it</h2>
             <p className="mt-3 text-[14.5px] leading-relaxed text-fg-2">

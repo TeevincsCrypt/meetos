@@ -97,7 +97,7 @@ export function AnalyzePanel({ meeting, transcript, autoFocus }: { meeting: Meet
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-3">
             <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${chunks.length ? (done / chunks.length) * 100 : 0}%` }} />
           </div>
-          <ol className="mt-3 grid gap-1.5 sm:grid-cols-2">
+          <ol className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {chunks.map((c) => (
               <li key={c.index} className="flex items-center gap-2 text-[12.5px]">
                 {c.state === 'done' ? (

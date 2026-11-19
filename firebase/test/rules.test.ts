@@ -94,6 +94,11 @@ describe('workspace isolation', () => {
     await assertFails(getDoc(doc(anon, 'workspaces', W)));
   });
 
+  it('profile merge-writes with partial fields are allowed, invalid ones are not', async () => {
+    await assertSucceeds(setDoc(doc(db(MEMBER), 'users', MEMBER), { lastWorkspaceId: W }, { merge: true }));
+    await assertFails(setDoc(doc(db(MEMBER), 'users', MEMBER), { displayName: 42 }, { merge: true }));
+  });
+
   it('users can only access their own profile', async () => {
     await assertSucceeds(setDoc(doc(db(MEMBER), 'users', MEMBER), { displayName: 'M', lastWorkspaceId: W }));
     await assertFails(getDoc(doc(db(STRANGER), 'users', MEMBER)));

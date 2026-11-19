@@ -83,7 +83,8 @@ export default function ExecutionPage() {
 
   return (
     <div>
-      <PageHeader title="Execution" description="Do your meetings lead to action? Every number here is computed from your stored commitments." actions={filters} />
+      <PageHeader title="Execution" description="Do your meetings lead to action? Every number here is computed from your stored commitments." />
+      <div className="mb-5">{filters}</div>
 
       {metrics.created === 0 ? (
         <Card><EmptyState icon={BarChart3} title="No commitments in this selection" compact>Try a longer period or clear the filters.</EmptyState></Card>
@@ -103,7 +104,7 @@ export default function ExecutionPage() {
             />
           </Card>
 
-          <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
             <Card>
               <CardHeader
                 icon={TrendingUp}
@@ -169,7 +170,7 @@ export default function ExecutionPage() {
             </Card>
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
             <Card>
               <CardHeader icon={Clock} title="Repeatedly postponed" subtitle="Deadline moved 2+ times" />
               {metrics.postponed.length === 0 ? (

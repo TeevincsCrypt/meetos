@@ -63,7 +63,7 @@ export function CommitmentFormModal({ open, onOpenChange, meeting }: { open: boo
         <Field label="What was promised" htmlFor="f-desc">
           <Textarea id="f-desc" required rows={2} maxLength={2000} value={description} onChange={(e) => setDescription(e.target.value)} />
         </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Owner" htmlFor="f-owner">
             <Input id="f-owner" list="people-list" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="Unassigned" />
             <datalist id="people-list">{people.map((p) => <option key={p} value={p} />)}</datalist>

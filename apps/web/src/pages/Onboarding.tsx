@@ -109,8 +109,11 @@ export function OnboardingPage({ error }: { error?: string | null }) {
               setBusy('demo');
               setErr(null);
               try {
-                await createDemoWorkspace(user, actor);
-                toast.success('Demo workspace created');
+                await toast.promise(createDemoWorkspace(user, actor), {
+                  loading: 'Creating the demo workspace and adding sample meetings…',
+                  success: 'Demo workspace ready — open a sample meeting and press Analyse',
+                  error: 'Could not finish creating the demo workspace',
+                }).unwrap();
               } catch (e2) {
                 setErr(e2 instanceof Error ? e2.message : 'Could not create the demo workspace.');
               } finally {

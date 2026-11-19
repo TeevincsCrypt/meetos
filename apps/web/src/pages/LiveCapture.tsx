@@ -293,7 +293,7 @@ export default function LiveCapturePage() {
           {existingTranscript && (
             <Notice tone="warning" icon={Info} className="mt-4">This meeting already has a transcript. New speech will be appended to it.</Notice>
           )}
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Spoken language" htmlFor="lang">
               <Select id="lang" value={lang} onChange={(e) => setLang(e.target.value)}>
                 {LANGS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}

@@ -118,11 +118,11 @@ function DailyBrief() {
         {facts.isEmpty ? (
           <p className="text-[13px] text-fg-3">Nothing needs attention right now. Analysed meetings will populate this brief with overdue work, recent decisions and open questions.</p>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <BriefSection title="Needs attention today" icon={AlertTriangle} tone="text-danger" empty={!attention.length && !facts.pendingCompletion.length && !facts.blocked.length}>
               {attention.slice(0, 5).map((c) => (
-                <li key={c.id} className="flex items-baseline justify-between gap-3 text-[13px]">
-                  <Link to={`/app/commitments/${c.id}`} className="min-w-0 truncate text-fg hover:underline">{c.description}</Link>
+                <li key={c.id} className="flex flex-wrap items-baseline justify-between gap-x-3 text-[13px]">
+                  <Link to={`/app/commitments/${c.id}`} className="min-w-0 max-w-full truncate text-fg hover:underline">{c.description}</Link>
                   <span className="flex shrink-0 items-center gap-2 text-[12px] text-fg-3">{c.ownerName ?? 'Unassigned'} · <DueLabel c={c} /></span>
                 </li>
               ))}
@@ -285,7 +285,7 @@ export default function DashboardPage() {
         <Stat label="Decisions" value={decisions.filter((d) => d.status !== 'superseded').length} icon={Gavel} />
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="space-y-6">
           <DailyBrief />
           <Card>

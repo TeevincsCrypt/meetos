@@ -157,7 +157,7 @@ function EditModal({ c, open, onOpenChange }: { c: Commitment; open: boolean; on
         }}
       >
         <Field label="Description" htmlFor="c-desc"><Textarea id="c-desc" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Field label="Owner" htmlFor="c-owner">
             <Input id="c-owner" list="c-people" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="Unassigned" />
             <datalist id="c-people">{people.map((p) => <option key={p} value={p} />)}</datalist>
@@ -263,7 +263,7 @@ export default function CommitmentDetailPage() {
         </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader icon={CalendarClock} title="Timeline" subtitle="Append-only history. AI-detected events cite the transcript." />
           {events === null ? (

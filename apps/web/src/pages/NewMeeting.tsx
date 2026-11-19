@@ -103,7 +103,7 @@ export default function NewMeetingPage() {
       <PageHeader title="New meeting" description="Add the details, then record live or bring a transcript." />
 
       <Card className="p-5">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Title" htmlFor="m-title" className="sm:col-span-2">
             <Input id="m-title" required maxLength={200} placeholder="e.g. Weekly product sync" value={title} onChange={(e) => setTitle(e.target.value)} />
           </Field>
@@ -123,7 +123,7 @@ export default function NewMeetingPage() {
       </Card>
 
       <h2 className="mt-8 mb-3 text-[14px] font-semibold text-fg">How will you capture it?</h2>
-      <div className="grid gap-3 sm:grid-cols-4" role="radiogroup" aria-label="Capture method">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4" role="radiogroup" aria-label="Capture method">
         {MODES.map((m) => (
           <button
             key={m.id}

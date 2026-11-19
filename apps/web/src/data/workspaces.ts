@@ -52,6 +52,11 @@ export async function updateUserProfile(uid: string, patch: Partial<Pick<UserPro
   await setDoc(doc(db(), 'users', uid), patch, { merge: true });
 }
 
+/** Remembering the last workspace is a convenience; it must never block real work. */
+async function rememberWorkspace(uid: string, wid: string) {
+  await updateUserProfile(uid, { lastWorkspaceId: wid }).catch((e) => console.warn('Could not save last workspace', e));
+}
+
 // ---------------------------------------------------------------- workspaces
 
 /**
@@ -91,7 +96,7 @@ export async function createWorkspace(user: AuthUserLike, input: { name: string;
   await batch.commit();
   // Member profile doc can only be written once membership exists.
   await setDoc(doc(db(), 'workspaces', ref.id, 'members', user.uid), memberDoc(user, 'owner'));
-  await updateUserProfile(user.uid, { lastWorkspaceId: ref.id });
+  await rememberWorkspace(user.uid, ref.id);
   await logActivity(ref.id, { uid: user.uid, name: displayNameOf(user) }, 'workspace_created', `created the workspace "${input.name}"`);
   return ref.id;
 }
@@ -216,7 +221,7 @@ export async function acceptInvite(user: AuthUserLike, invite: Invite) {
   });
   await setDoc(wsItem(invite.workspaceId, 'members', user.uid), memberDoc(user, invite.role));
   await deleteDoc(wsItem(invite.workspaceId, 'invites', email)).catch(() => undefined);
-  await updateUserProfile(user.uid, { lastWorkspaceId: invite.workspaceId });
+  await rememberWorkspace(user.uid, invite.workspaceId);
   await logActivity(invite.workspaceId, { uid: user.uid, name: displayNameOf(user) }, 'member_joined', `joined the workspace as ${invite.role}`);
 }
 

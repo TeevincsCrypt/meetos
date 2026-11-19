@@ -165,7 +165,7 @@ export default function PreparePage() {
           </EmptyState>
         </Card>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[1fr_1.15fr]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
           <div className="space-y-6">
             <Card>
               <CardHeader icon={Video} title={meeting.title} subtitle={meeting.scheduledAt ? fmtDateTime(meeting.scheduledAt) : undefined} />

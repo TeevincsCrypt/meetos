@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint src e2e",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run --passWithNoTests --dir src",
     "e2e": "vite build --mode emulator && playwright test"
   },
   "dependencies": {

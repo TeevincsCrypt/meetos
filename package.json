@@ -13,7 +13,7 @@
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "emulators": "firebase emulators:start --only auth,firestore --project demo-meetos",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-meetos \"pnpm --filter @meetos/firebase-tests test\"",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-meetos \"pnpm --filter @meetos/firebase-tests test:rules\"",
     "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-meetos \"pnpm --filter @meetos/web e2e\""
   },
   "devDependencies": {

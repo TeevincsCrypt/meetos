@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { AlertTriangle, ClipboardPaste, Info, Mic, MicOff, Pause, Play, ShieldCheck, Square } from 'lucide-react';
 import type { Meeting } from '@meetos/shared';
 import { useSession } from '@/state/auth';
 import { useWs } from '@/state/workspace';
 import { appendSegment, getSegments, getTranscript, listenMeeting, patchMeeting, saveTranscript, segmentsToTranscript } from '@/data/meetings';
-import { Avatar, Button, Card, cn, ErrorNote, Field, Notice, PageHeader, Select, Skeleton } from '@/components/ui';
+import { Avatar, Button, ButtonLink, Card, cn, ErrorNote, Field, Notice, PageHeader, Select, Skeleton } from '@/components/ui';
 import { Timestamp, serverTimestamp } from 'firebase/firestore';
 
 // Minimal typings for the Web Speech API (not in TypeScript's DOM lib).
@@ -245,9 +245,7 @@ export default function LiveCapturePage() {
               <p className="mt-1 text-[13.5px] text-fg-2">
                 Live capture uses the browser's Web Speech API, which is available in Chrome and Edge on desktop. You can still paste or upload a transcript from your meeting tool.
               </p>
-              <Link to={`/app/meetings/${id}?tab=transcript&edit=1`}>
-                <Button className="mt-4" variant="primary" icon={ClipboardPaste}>Add a transcript instead</Button>
-              </Link>
+              <ButtonLink to={`/app/meetings/${id}?tab=transcript&edit=1`} className="mt-4" variant="primary" icon={ClipboardPaste}>Add a transcript instead</ButtonLink>
             </div>
           </div>
         </Card>

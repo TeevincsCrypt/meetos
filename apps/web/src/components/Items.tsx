@@ -13,7 +13,7 @@ import { DecisionStatusBadge, DueLabel, EvidenceQuote, OriginBadge, PriorityBadg
 
 const STATUSES: CommitmentStatus[] = ['open', 'in_progress', 'blocked', 'completed', 'cancelled'];
 
-export function CommitmentRow({ c, showMeeting = true, contextQuote }: { c: Commitment; showMeeting?: boolean; contextQuote?: string | null }) {
+export function CommitmentRow({ c, showMeeting = true, contextQuote, footer }: { c: Commitment; showMeeting?: boolean; contextQuote?: string | null; footer?: React.ReactNode }) {
   const { wid } = useWs();
   const { actor } = useSession();
   const navigate = useNavigate();
@@ -62,6 +62,7 @@ export function CommitmentRow({ c, showMeeting = true, contextQuote }: { c: Comm
           {c.pendingCompletion && <Badge tone="device">Reported done · confirm</Badge>}
         </div>
         {contextQuote && <p className="mt-1.5 text-[12.5px] text-fg-2 italic">“{contextQuote}”</p>}
+        {footer && <div className="mt-3">{footer}</div>}
       </div>
       <div className="flex shrink-0 items-start gap-2">
         <PriorityBadge priority={c.priority} />
@@ -122,12 +123,12 @@ export function PendingCompletionBar({ c }: { c: Commitment }) {
   );
 }
 
-export function DecisionCard({ d, showMeeting = true }: { d: Decision; showMeeting?: boolean }) {
+export function DecisionCard({ d, showMeeting = true, highlight }: { d: Decision; showMeeting?: boolean; highlight?: boolean }) {
   const { wid, decisions } = useWs();
   const { actor } = useSession();
   const related = d.relatedDecisionIds.map((id) => decisions.find((x) => x.id === id)).filter(Boolean) as Decision[];
   return (
-    <li id={`decision-${d.id}`} className="px-5 py-4">
+    <li id={`decision-${d.id}`} className={cn('px-5 py-4', highlight && 'bg-brand-soft/40')}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-semibold text-fg">{d.title}</div>

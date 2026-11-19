@@ -36,7 +36,7 @@ import { listenActivity } from '@/data/activity';
 import { runStructured } from '@/lib/ai/hybrid';
 import { seedSampleMeetings } from '@/lib/demo';
 import { fmtDate, fmtDateTime, fmtRelative } from '@/lib/format';
-import { Avatar, Badge, Button, Card, CardHeader, EmptyState, ErrorNote, PageHeader, Skeleton, Stat } from '@/components/ui';
+import { Avatar, Badge, Button, ButtonLink, Card, CardHeader, EmptyState, ErrorNote, PageHeader, Skeleton, Stat } from '@/components/ui';
 import { DecisionStatusBadge, DueLabel, InferenceBadge, SampleBadge } from '@/components/domain';
 import { MeetingStatusBadge } from './Meetings';
 
@@ -324,9 +324,7 @@ export default function DashboardPage() {
                       <div className="truncate text-[13.5px] font-medium text-fg hover:underline">{m.title}</div>
                       <div className="text-[12px] text-fg-3">{fmtDateTime(m.scheduledAt)}</div>
                     </Link>
-                    <Link to={`/app/prepare?meeting=${m.id}`}>
-                      <Button size="sm" variant="ghost">Prepare <ArrowRight className="size-3.5" aria-hidden /></Button>
-                    </Link>
+                    <ButtonLink to={`/app/prepare?meeting=${m.id}`} size="sm" variant="ghost">Prepare <ArrowRight className="size-3.5" aria-hidden /></ButtonLink>
                   </li>
                 ))}
               </ul>

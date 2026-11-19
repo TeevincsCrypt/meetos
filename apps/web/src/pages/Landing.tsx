@@ -1,4 +1,3 @@
-import { Link } from 'react-router';
 import {
   ArrowRight,
   BarChart3,
@@ -17,7 +16,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Logo } from '@/components/brand';
-import { Badge, Button, cn } from '@/components/ui';
+import { Badge, Button, ButtonLink, cn } from '@/components/ui';
 import { useTheme } from '@/components/AppShell';
 import { Moon, Sun } from 'lucide-react';
 
@@ -83,17 +82,11 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" icon={dark ? Sun : Moon} aria-label="Toggle theme" onClick={toggle} />
           {setupMode ? (
-            <Link to="/setup">
-              <Button variant="primary">Finish setup</Button>
-            </Link>
+            <ButtonLink to="/setup" variant="primary">Finish setup</ButtonLink>
           ) : (
             <>
-              <Link to="/signin">
-                <Button variant="ghost">Sign in</Button>
-              </Link>
-              <Link to="/signup">
-                <Button variant="primary">Get started</Button>
-              </Link>
+              <ButtonLink to="/signin" variant="ghost">Sign in</ButtonLink>
+              <ButtonLink to="/signup" variant="primary">Get started</ButtonLink>
             </>
           )}
         </div>
@@ -110,11 +103,9 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
             meetings until a person confirms it's done.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to={setupMode ? '/setup' : '/signup'}>
-              <Button variant="primary" size="lg">
+            <ButtonLink to={setupMode ? '/setup' : '/signup'} variant="primary" size="lg">
                 Start your workspace <ArrowRight className="size-4" aria-hidden />
-              </Button>
-            </Link>
+              </ButtonLink>
             <a href="#how">
               <Button variant="secondary" size="lg">How it works</Button>
             </a>

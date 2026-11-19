@@ -3,6 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as DM from '@radix-ui/react-dropdown-menu';
 import { clsx } from 'clsx';
 import { Loader2, X } from 'lucide-react';
+import { Link } from 'react-router';
 import type { LucideIcon } from 'lucide-react';
 
 export const cn = clsx;
@@ -55,6 +56,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     </button>
   );
 });
+
+/** A link that looks like a button (never nest a <button> inside an <a>). */
+export function ButtonLink({ to, variant = 'secondary', size = 'md', icon: Icon, className, children, ...rest }: { to: string; variant?: Variant; size?: Size; icon?: LucideIcon; className?: string; children?: ReactNode; 'aria-label'?: string }) {
+  return (
+    <Link
+      to={to}
+      className={cn('inline-flex items-center font-medium whitespace-nowrap transition-colors duration-150 select-none', variants[variant], sizes[size], className)}
+      {...rest}
+    >
+      {Icon ? <Icon className="size-4 shrink-0" aria-hidden /> : null}
+      {children}
+    </Link>
+  );
+}
 
 // ---------------------------------------------------------------- Card
 

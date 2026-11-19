@@ -2,7 +2,7 @@
   "name": "meetos",
   "private": true,
   "version": "0.1.0",
-  "description": "MEETOS — AI meeting intelligence and execution platform (Firebase AI Logic hybrid inference).",
+  "description": "MEETOS \u2014 AI meeting intelligence and execution platform (Firebase AI Logic hybrid inference).",
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.28.0",
   "scripts": {
@@ -17,6 +17,13 @@
     "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-meetos \"pnpm --filter @meetos/web e2e\""
   },
   "devDependencies": {
-    "firebase-tools": "^15.37.0"
-  }
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "firebase-tools": "^15.37.0",
+    "globals": "^17.14.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.73.0"
+  },
+  "type": "module"
 }

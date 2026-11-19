@@ -227,7 +227,7 @@ export async function runStructured<T>(task: StructuredTask<T>, pref: AiPreferen
       // The call itself failed. Only an on-device failure can be retried in the cloud.
       const onDeviceAttempted = mode !== InferenceMode.ONLY_IN_CLOUD && availability === 'available';
       if (!onDeviceAttempted || !allowCloud || mode === InferenceMode.PREFER_IN_CLOUD) {
-        throw new Error(friendlyError(e));
+        throw new Error(friendlyError(e), { cause: e });
       }
       firstError = e;
     }
@@ -245,7 +245,7 @@ export async function runStructured<T>(task: StructuredTask<T>, pref: AiPreferen
       detail: `Cloud fallback used — on-device attempt failed: ${friendlyError(firstError)}`,
     };
   } catch (e) {
-    throw new Error(`On-device attempt failed (${friendlyError(firstError)}) and cloud fallback failed (${friendlyError(e)}).`);
+    throw new Error(`On-device attempt failed (${friendlyError(firstError)}) and cloud fallback failed (${friendlyError(e)}).`, { cause: e });
   }
 }
 

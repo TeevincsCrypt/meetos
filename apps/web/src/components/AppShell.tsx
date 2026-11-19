@@ -23,6 +23,7 @@ import { useSession } from '@/state/auth';
 import { useWorkspace } from '@/state/workspace';
 import { Logo } from './brand';
 import { AiStatusPill } from './AiStatus';
+import { ErrorBoundary } from './ErrorBoundary';
 import { Avatar, Button, cn, DropdownMenu as DM } from './ui';
 
 const NAV = [
@@ -246,7 +247,9 @@ export function AppShell({ banner }: { banner?: ReactNode }) {
         </header>
         {banner}
         <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-          <Outlet />
+          <ErrorBoundary resetKey={location.pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

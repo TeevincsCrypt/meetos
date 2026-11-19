@@ -28,7 +28,7 @@ import { useWs } from '@/state/workspace';
 import { deleteMeeting, listenMeeting, listenTranscript, saveTranscript, setMeetingArchived, updateMeeting } from '@/data/meetings';
 import { fromSnap, wsCol } from '@/data/db';
 import { fmtDate, fmtDateTime, fmtRelative, fromDateTimeInput, toDateTimeInput } from '@/lib/format';
-import { Avatar, Badge, Button, Card, CardHeader, EmptyState, ErrorNote, Field, Input, Menu, Modal, Notice, PageHeader, Skeleton, Tabs, Textarea } from '@/components/ui';
+import { Avatar, Badge, Button, ButtonLink, Card, CardHeader, EmptyState, ErrorNote, Field, Input, Menu, Modal, Notice, PageHeader, Skeleton, Tabs, Textarea } from '@/components/ui';
 import { EvidenceQuote, InferenceBadge, SampleBadge } from '@/components/domain';
 import { AnalyzePanel } from '@/components/AnalyzePanel';
 import { CommitmentRow, DecisionCard, PendingCompletionBar, QuestionRow } from '@/components/Items';
@@ -245,7 +245,7 @@ export default function MeetingDetailPage() {
   if (meeting === null) {
     return (
       <Card>
-        <EmptyState icon={FileText} title="Meeting not found" action={<Link to="/app/meetings"><Button>Back to meetings</Button></Link>}>
+        <EmptyState icon={FileText} title="Meeting not found" action={<ButtonLink to="/app/meetings">Back to meetings</ButtonLink>}>
           It may have been deleted, or you may not have access to it.
         </EmptyState>
       </Card>
@@ -280,9 +280,9 @@ export default function MeetingDetailPage() {
         actions={
           <>
             {meeting.status === 'scheduled' && (
-              <Link to={`/app/prepare?meeting=${meeting.id}`}><Button icon={ClipboardList}>Prepare</Button></Link>
+              <ButtonLink to={`/app/prepare?meeting=${meeting.id}`} icon={ClipboardList}>Prepare</ButtonLink>
             )}
-            <Link to={`/app/meetings/${meeting.id}/live`}><Button icon={Mic} variant={hasTranscript ? 'secondary' : 'primary'}>{hasTranscript ? 'Record more' : 'Record'}</Button></Link>
+            <ButtonLink to={`/app/meetings/${meeting.id}/live`} icon={Mic} variant={hasTranscript ? 'secondary' : 'primary'}>{hasTranscript ? 'Record more' : 'Record'}</ButtonLink>
             <Menu
               trigger={<Button size="icon" icon={MoreHorizontal} aria-label="More actions" />}
               items={[
@@ -325,7 +325,7 @@ export default function MeetingDetailPage() {
                   title="No transcript yet"
                   action={
                     <div className="flex gap-2">
-                      <Link to={`/app/meetings/${meeting.id}/live`}><Button variant="primary" icon={Mic}>Record live</Button></Link>
+                      <ButtonLink to={`/app/meetings/${meeting.id}/live`} variant="primary" icon={Mic}>Record live</ButtonLink>
                       <Button icon={Plus} onClick={() => setTab('transcript')}>Paste transcript</Button>
                     </div>
                   }
@@ -479,10 +479,12 @@ export default function MeetingDetailPage() {
             ) : (
               <ul className="divide-y divide-line border-t border-line">
                 {discussed.map((c) => (
-                  <div key={c.id}>
-                    <CommitmentRow c={c} contextQuote={c.evidence.find((e) => e.meetingId === meeting.id)?.quote} />
-                    {c.pendingCompletion?.evidence.meetingId === meeting.id && <div className="px-5 pb-4"><PendingCompletionBar c={c} /></div>}
-                  </div>
+                  <CommitmentRow
+                    key={c.id}
+                    c={c}
+                    contextQuote={c.evidence.find((e) => e.meetingId === meeting.id)?.quote}
+                    footer={c.pendingCompletion?.evidence.meetingId === meeting.id ? <PendingCompletionBar c={c} /> : undefined}
+                  />
                 ))}
               </ul>
             )}

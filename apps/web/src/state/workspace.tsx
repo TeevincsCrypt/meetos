@@ -68,25 +68,36 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const wid = workspace?.id ?? null;
 
+  // Subscribe to the selected workspace. A listener that fails (e.g. a
+  // transient permission error right after joining) is retried with backoff
+  // instead of leaving the page waiting forever.
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
     setData(EMPTY);
     setLoadedKeys(new Set());
+    setError(null);
     if (!wid) return;
+    let failed = false;
     const set = <K extends keyof Collections>(k: K) => (v: Collections[K]) => {
       setData((d) => ({ ...d, [k]: v }));
       setLoadedKeys((s) => (s.has(k) ? s : new Set([...s, k])));
     };
-    const onErr = (e: Error) => setError(e.message);
+    const onErr = (e: Error) => {
+      if (failed) return;
+      failed = true;
+      setError(e.message);
+      if (retry < 5) setTimeout(() => setRetry((r) => r + 1), 500 * 2 ** retry);
+    };
     const unsubs = [
       listenRecentMeetings(wid, set('meetings'), onErr),
       listenCommitments(wid, set('commitments'), onErr),
       listenDecisions(wid, set('decisions'), onErr),
       listenQuestions(wid, set('questions'), onErr),
-      listenProjects(wid, set('projects')),
-      listenMembers(wid, set('members')),
+      listenProjects(wid, set('projects'), onErr),
+      listenMembers(wid, set('members'), onErr),
     ];
     return () => unsubs.forEach((u) => u());
-  }, [wid]);
+  }, [wid, retry]);
 
   const selectWorkspace = useCallback(
     (id: string) => {

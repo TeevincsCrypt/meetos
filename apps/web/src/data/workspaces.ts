@@ -54,10 +54,23 @@ export async function updateUserProfile(uid: string, patch: Partial<Pick<UserPro
 
 // ---------------------------------------------------------------- workspaces
 
+/**
+ * Workspaces the user belongs to. Documents with pending local writes are
+ * held back until the server has committed them: security rules for the
+ * workspace's subcollections check the *committed* workspace document, so
+ * subscribing earlier would be rejected.
+ */
 export function listenMyWorkspaces(uid: string, cb: (ws: Workspace[]) => void, onError: (e: Error) => void) {
   return onSnapshot(
     query(collection(db(), 'workspaces'), where('memberIds', 'array-contains', uid)),
-    (snap) => cb(snap.docs.map((d) => fromSnap<Workspace>(d)).sort((a, b) => a.name.localeCompare(b.name))),
+    { includeMetadataChanges: true },
+    (snap) =>
+      cb(
+        snap.docs
+          .filter((d) => !d.metadata.hasPendingWrites)
+          .map((d) => fromSnap<Workspace>(d))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      ),
     onError,
   );
 }
@@ -98,9 +111,11 @@ export async function updateWorkspace(wid: string, patch: { name: string; descri
   await updateDoc(wsDoc(wid), { name: patch.name.trim().slice(0, 80), description: patch.description.trim().slice(0, 500), updatedAt: serverTimestamp() });
 }
 
-export function listenMembers(wid: string, cb: (m: Member[]) => void) {
-  return onSnapshot(wsCol(wid, 'members'), (snap) =>
-    cb(snap.docs.map((d) => ({ ...fromSnap<Member>(d), uid: d.id })).sort((a, b) => a.displayName.localeCompare(b.displayName))),
+export function listenMembers(wid: string, cb: (m: Member[]) => void, onError?: (e: Error) => void) {
+  return onSnapshot(
+    wsCol(wid, 'members'),
+    (snap) => cb(snap.docs.map((d) => ({ ...fromSnap<Member>(d), uid: d.id })).sort((a, b) => a.displayName.localeCompare(b.displayName))),
+    onError,
   );
 }
 
@@ -207,9 +222,11 @@ export async function acceptInvite(user: AuthUserLike, invite: Invite) {
 
 // ---------------------------------------------------------------- projects
 
-export function listenProjects(wid: string, cb: (p: Project[]) => void) {
-  return onSnapshot(wsCol(wid, 'projects'), (snap) =>
-    cb(snap.docs.map((d) => fromSnap<Project>(d)).sort((a, b) => a.name.localeCompare(b.name))),
+export function listenProjects(wid: string, cb: (p: Project[]) => void, onError?: (e: Error) => void) {
+  return onSnapshot(
+    wsCol(wid, 'projects'),
+    (snap) => cb(snap.docs.map((d) => fromSnap<Project>(d)).sort((a, b) => a.name.localeCompare(b.name))),
+    onError,
   );
 }
 

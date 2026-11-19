@@ -26,13 +26,13 @@ export interface TranscriptChunk {
 }
 
 const SPEAKER_RE =
-  /^\s*(?:\[?\(?\d{1,2}:\d{2}(?::\d{2})?(?:[.,]\d+)?\)?\]?\s*[-–]?\s*)?([A-Z][\p{L}.'\-]*(?:\s+[A-Z][\p{L}.'\-]*){0,3}|Speaker\s*\d+)\s*(?:\(\s*[^)]{0,30}\))?\s*:\s+(.+)$/u;
+  /^\s*(?:\[?\(?\d{1,2}:\d{2}(?::\d{2})?(?:[.,]\d+)?\)?\]?\s*[-–]?\s*)?([A-Z][\p{L}.'-]*(?:\s+[A-Z][\p{L}.'-]*){0,3}|Speaker\s*\d+)\s*(?:\(\s*[^)]{0,30}\))?\s*:\s+(.+)$/u;
 
 export function normalizeTranscript(text: string): string {
   return text
-    .replace(/^﻿/, '')
+    .replace(/^\uFEFF/, '')
     .replace(/\r\n?/g, '\n')
-    .replace(/[\t ]/g, ' ')
+    .replace(/[\t\u00A0]/g, ' ')
     .split('\n')
     .map((l) => l.replace(/\s+$/g, ''))
     .join('\n')

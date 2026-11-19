@@ -102,7 +102,7 @@ export function resolveDeadline(
     return { at: null, text: null };
   }
   const ref = new Date(opts.reference);
-  let parsed: Date | null = null;
+  let parsed: Date | null;
   try {
     parsed = chrono.parseDate(text, ref, { forwardDate: true });
   } catch {

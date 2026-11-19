@@ -19,6 +19,10 @@ actually ran.
 | Firebase | `firebase/` — security rules, indexes, rules tests |
 | Docs | [`docs/SETUP.md`](docs/SETUP.md) · [`docs/HYBRID_AI.md`](docs/HYBRID_AI.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DEMO.md`](docs/DEMO.md) · [`docs/STATUS.md`](docs/STATUS.md) |
 
+| Landing | Live meeting room | Commitment Graph |
+|---|---|---|
+| ![Landing page](docs/screenshots/landing.png) | ![Live meeting room](docs/screenshots/live-meeting-room.png) | ![Commitment Graph](docs/screenshots/commitment-graph.png) |
+
 ## What it does
 
 - **Commitment Graph** — every promise ("I'll finish the landing page before Friday") becomes a

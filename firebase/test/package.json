@@ -1,0 +1,14 @@
+{
+  "name": "@meetos/firebase-tests",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.4.0",
+    "vitest": "^4.1.5"
+  }
+}

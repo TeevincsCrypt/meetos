@@ -1,0 +1,249 @@
+rules_version = '2';
+
+// MEETOS Firestore Security Rules
+//
+// Access model
+//  - A workspace document holds `roles` (uid -> 'owner' | 'admin' | 'member')
+//    and `memberIds` (the same uids, for array-contains queries). They must
+//    always stay in sync.
+//  - Only members can read anything inside a workspace.
+//  - Ownership is `ownerId`. Only the owner changes roles or deletes the workspace.
+//  - Invited users join by adding themselves with exactly the invited role,
+//    and only with a verified email that matches the invite.
+//  - Commitments can only be marked completed with a confirmation record by
+//    the signed-in user (AI inference alone can never complete a task).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function wsPath(wid) { return /databases/$(database)/documents/workspaces/$(wid); }
+    function ws(wid) { return get(wsPath(wid)).data; }
+    function roleOf(data) { return data.roles.get(me(), null); }
+    function isMember(wid) { return signedIn() && roleOf(ws(wid)) != null; }
+    function isAdmin(wid) {
+      let w = ws(wid);
+      return signedIn() && (w.ownerId == me() || roleOf(w) == 'admin');
+    }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function verifiedEmail() {
+      return signedIn() && request.auth.token.email != null && request.auth.token.email_verified == true;
+    }
+    function isStr(v, max) { return v is string && v.size() <= max; }
+    function optStr(v, max) { return v == null || isStr(v, max); }
+    function changedOnly(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+    function rolesInSync(d) { return d.memberIds.toSet() == d.roles.keys().toSet(); }
+    function validRoles(d) {
+      return d.roles is map && d.memberIds is list && d.memberIds.size() <= 200 && rolesInSync(d)
+        && d.roles[d.ownerId] == 'owner';
+    }
+
+    // ------------------------------------------------------------------ users
+    match /users/{userId} {
+      allow read, delete: if signedIn() && me() == userId;
+      allow create, update: if signedIn() && me() == userId
+        && isStr(request.resource.data.displayName, 120)
+        && optStr(request.resource.data.lastWorkspaceId, 128);
+    }
+
+    // ------------------------------------------------------------- invites (collection group)
+    // Lets a signed-in user find invites addressed to their verified email.
+    match /{path=**}/invites/{inviteId} {
+      allow read: if verifiedEmail() && resource.data.email == myEmail();
+    }
+
+    // ------------------------------------------------------------- workspaces
+    match /workspaces/{wid} {
+      allow read: if signedIn() && me() in resource.data.memberIds;
+
+      allow create: if signedIn()
+        && request.resource.data.ownerId == me()
+        && request.resource.data.roles.keys() == [me()]
+        && request.resource.data.roles[me()] == 'owner'
+        && request.resource.data.memberIds == [me()]
+        && isStr(request.resource.data.name, 80)
+        && isStr(request.resource.data.description, 500)
+        && request.resource.data.isDemo is bool;
+
+      // Owner: anything except transferring ownership implicitly.
+      allow update: if signedIn() && resource.data.ownerId == me()
+        && request.resource.data.ownerId == resource.data.ownerId
+        && validRoles(request.resource.data)
+        && isStr(request.resource.data.name, 80)
+        && isStr(request.resource.data.description, 500);
+
+      // Admin: rename / describe only.
+      allow update: if signedIn() && roleOf(resource.data) == 'admin'
+        && changedOnly(['name', 'description', 'updatedAt'])
+        && isStr(request.resource.data.name, 80)
+        && isStr(request.resource.data.description, 500);
+
+      // Member leaving: remove only yourself (the owner cannot leave).
+      allow update: if signedIn() && me() in resource.data.memberIds && resource.data.ownerId != me()
+        && changedOnly(['roles', 'memberIds', 'updatedAt'])
+        && request.resource.data.roles.diff(resource.data.roles).affectedKeys().hasOnly([me()])
+        && !(me() in request.resource.data.roles)
+        && rolesInSync(request.resource.data);
+
+      // Accepting an invite: add only yourself, with exactly the invited role.
+      allow update: if verifiedEmail() && !(me() in resource.data.memberIds)
+        && exists(/databases/$(database)/documents/workspaces/$(wid)/invites/$(myEmail()))
+        && changedOnly(['roles', 'memberIds', 'updatedAt'])
+        && request.resource.data.roles.diff(resource.data.roles).affectedKeys().hasOnly([me()])
+        && request.resource.data.roles[me()] == get(/databases/$(database)/documents/workspaces/$(wid)/invites/$(myEmail())).data.role
+        && rolesInSync(request.resource.data);
+
+      allow delete: if signedIn() && resource.data.ownerId == me();
+
+      // ---------------------------------------------------------- members (profiles)
+      match /members/{memberId} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && memberId == me()
+          && request.resource.data.uid == me()
+          && request.resource.data.role == ws(wid).roles[me()]
+          && isStr(request.resource.data.displayName, 120);
+        // The owner may refresh a member's role mirror after changing roles.
+        allow update: if isAdmin(wid) && ws(wid).ownerId == me()
+          && changedOnly(['role'])
+          && request.resource.data.role == ws(wid).roles[memberId];
+        allow delete: if signedIn() && (memberId == me() || ws(wid).ownerId == me());
+      }
+
+      // ---------------------------------------------------------- invites
+      match /invites/{email} {
+        allow read: if isMember(wid) || (verifiedEmail() && email == myEmail());
+        allow create: if isAdmin(wid)
+          && email == request.resource.data.email
+          && email == email.lower()
+          && request.resource.data.role in ['admin', 'member']
+          && request.resource.data.workspaceId == wid
+          && request.resource.data.invitedBy == me();
+        allow delete: if isAdmin(wid) || (verifiedEmail() && email == myEmail());
+      }
+
+      // ---------------------------------------------------------- projects
+      match /projects/{projectId} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid)
+          && isStr(request.resource.data.name, 80)
+          && isStr(request.resource.data.description, 500);
+        allow delete: if isAdmin(wid);
+      }
+
+      // ---------------------------------------------------------- meetings
+      match /meetings/{meetingId} {
+        allow read: if isMember(wid);
+        allow create: if isMember(wid)
+          && request.resource.data.workspaceId == wid
+          && request.resource.data.createdBy == me()
+          && isStr(request.resource.data.title, 200)
+          && isStr(request.resource.data.description, 2000);
+        allow update: if isMember(wid)
+          && request.resource.data.workspaceId == wid
+          && request.resource.data.createdBy == resource.data.createdBy
+          && isStr(request.resource.data.title, 200)
+          && isStr(request.resource.data.description, 2000);
+        allow delete: if isAdmin(wid) || (isMember(wid) && resource.data.createdBy == me());
+
+        // Transcript text lives in a separate doc so meeting lists stay light.
+        match /content/{docId} {
+          allow read: if isMember(wid);
+          allow create, update: if isMember(wid) && isStr(request.resource.data.text, 900000);
+          allow delete: if isMember(wid);
+        }
+        // Live-capture segments, written incrementally while recording.
+        match /segments/{segmentId} {
+          allow read: if isMember(wid);
+          allow create: if isMember(wid) && isStr(request.resource.data.text, 20000)
+            && request.resource.data.index is int;
+          allow delete: if isMember(wid);
+        }
+      }
+
+      // ---------------------------------------------------------- commitments
+      function validCommitment(d) {
+        return d.workspaceId == wid
+          && isStr(d.description, 2000)
+          && optStr(d.ownerName, 120)
+          && d.status in ['open', 'in_progress', 'completed', 'blocked', 'cancelled']
+          && d.priority in ['low', 'medium', 'high']
+          && d.meetingIds is list && d.meetingIds.size() <= 200
+          && d.evidence is list && d.evidence.size() <= 50;
+      }
+      // Completion requires a confirmation record by the signed-in user.
+      function completionConfirmedByMe(d) {
+        return d.status != 'completed'
+          || (d.completion != null && d.completion.method == 'user_confirmed' && d.completion.confirmedBy == me());
+      }
+
+      match /commitments/{commitmentId} {
+        allow read: if isMember(wid);
+        allow create: if isMember(wid)
+          && validCommitment(request.resource.data)
+          && request.resource.data.createdBy == me()
+          && completionConfirmedByMe(request.resource.data);
+        allow update: if isMember(wid)
+          && validCommitment(request.resource.data)
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.originMeetingId == resource.data.originMeetingId
+          && (resource.data.status == 'completed' || completionConfirmedByMe(request.resource.data));
+        allow delete: if isAdmin(wid) || (isMember(wid) && resource.data.createdBy == me());
+
+        // Immutable timeline. Events can only be removed together with their commitment.
+        match /events/{eventId} {
+          allow read: if isMember(wid);
+          allow create: if isMember(wid) && isStr(request.resource.data.type, 40)
+            && (request.resource.data.byUid == null || request.resource.data.byUid == me());
+          allow delete: if isMember(wid)
+            && !existsAfter(/databases/$(database)/documents/workspaces/$(wid)/commitments/$(commitmentId));
+        }
+      }
+
+      // ---------------------------------------------------------- decisions
+      match /decisions/{decisionId} {
+        allow read: if isMember(wid);
+        allow create: if isMember(wid)
+          && request.resource.data.workspaceId == wid
+          && request.resource.data.createdBy == me()
+          && isStr(request.resource.data.title, 300)
+          && request.resource.data.status in ['active', 'needs_confirmation', 'superseded', 'reversed'];
+        allow update: if isMember(wid)
+          && request.resource.data.workspaceId == wid
+          && request.resource.data.createdBy == resource.data.createdBy
+          && isStr(request.resource.data.title, 300)
+          && request.resource.data.status in ['active', 'needs_confirmation', 'superseded', 'reversed']
+          // Confirmation can only be recorded in your own name.
+          && (request.resource.data.confirmedBy == resource.data.confirmedBy
+              || request.resource.data.confirmedBy == me()
+              || request.resource.data.confirmedBy == null);
+        allow delete: if isAdmin(wid) || (isMember(wid) && resource.data.createdBy == me());
+      }
+
+      // ---------------------------------------------------------- questions
+      match /questions/{questionId} {
+        allow read: if isMember(wid);
+        allow create: if isMember(wid)
+          && request.resource.data.workspaceId == wid
+          && request.resource.data.createdBy == me()
+          && isStr(request.resource.data.text, 1000)
+          && request.resource.data.status in ['open', 'resolved'];
+        allow update: if isMember(wid)
+          && request.resource.data.workspaceId == wid
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.status in ['open', 'resolved'];
+        allow delete: if isAdmin(wid) || (isMember(wid) && resource.data.createdBy == me());
+      }
+
+      // ---------------------------------------------------------- activity (append-only)
+      match /activity/{activityId} {
+        allow read: if isMember(wid);
+        allow create: if isMember(wid) && request.resource.data.actorUid == me()
+          && isStr(request.resource.data.message, 500);
+        allow delete: if isAdmin(wid);
+      }
+    }
+  }
+}

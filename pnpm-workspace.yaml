@@ -1,0 +1,8 @@
+packages:
+  - apps/web
+  - packages/*
+  - firebase/test
+onlyBuiltDependencies:
+  - esbuild
+  - protobufjs
+  - re2

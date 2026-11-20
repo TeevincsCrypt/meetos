@@ -30,7 +30,7 @@ data class Actor(val uid: String, val name: String)
 
 /**
  * Firestore data access. Document shapes are identical to the web app's
- * (apps/web/src/data/*), so both clients work on the same workspace and the
+ * (see apps/web/src/data), so both clients work on the same workspace and the
  * same security rules apply.
  */
 object MeetosRepository {

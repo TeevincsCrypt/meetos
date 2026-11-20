@@ -2,8 +2,8 @@
 # latest released artifacts in firebase-android-sdk (ai-logic/*/gradle.properties).
 [versions]
 agp = "8.13.0"
-kotlin = "2.2.21"
-ksp = "2.3.2"
+kotlin = "2.4.21"
+ksp = "2.3.14"
 googleServices = "4.4.3"
 firebaseBom = "34.0.0"
 firebaseAi = "18.2.0"

@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-19._
+_Last updated: 2026-11-20._
 
 ## Verified in this repository (commands actually run)
 
@@ -11,7 +11,9 @@ _Last updated: 2026-11-19._
 | `pnpm test:e2e` — Playwright, Auth + Firestore emulators, real Firebase AI Logic SDK with a `LanguageModel` test double | 15 / 15 passing |
 | `pnpm typecheck`, `pnpm lint` | clean |
 | `pnpm build` — production web build | succeeds |
-| `apps/android/verify` — Kotlin analysis core on the JVM (Kotlin 2.2.21) | 8 / 8 passing |
+| `apps/android/verify` — Kotlin analysis core on the JVM | 8 / 8 passing |
+| Android `assembleDebug` + `testDebugUnitTest` (GitHub Actions, Kotlin 2.4.21, AGP 8.13) | passing |
+| Web app deployed on Vercel with a real Firebase project (sign-in verified by the owner) | live |
 | Visual review at 1360px and 390px (light + dark), no horizontal overflow | done |
 
 The e2e suite covers: sign-up, workspace creation, transcript import, on-device extraction with
@@ -25,9 +27,9 @@ cross-workspace isolation, cloud failure with retry, and "on-device only" making
 
 | Item | Reason | What to do |
 |---|---|---|
-| Real cloud Gemini responses | No Firebase project / credentials in this environment | Follow `docs/SETUP.md`, then run the demo |
+| Real cloud Gemini responses | Not yet exercised end-to-end on the live site | Analyse a sample meeting on the deployed app |
 | Real Chrome built-in model output quality | Headless test browser has no on-device model | Use a supported desktop Chrome |
-| Android `assembleDebug` | The Android SDK and Google Maven (`dl.google.com`) are blocked in this build environment | Build in Android Studio; versions are pinned to published releases. The pure-Kotlin core *was* compiled and tested |
+| Android app on a device | The APK compiles in CI but hasn't been run on a phone | Install from Android Studio with your `google-services.json` |
 | Android on-device inference | Needs a physical device supported by ML Kit GenAI | Check Settings → This device in the app |
 | Google sign-in | Needs OAuth configuration in your project | `docs/SETUP.md` §3 and §10 |
 | App Check enforcement | Needs reCAPTCHA Enterprise key / Play Integrity registration | `docs/SETUP.md` §6 |

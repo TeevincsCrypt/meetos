@@ -26,6 +26,7 @@ import {
 import type { InferenceSourceLabel } from '@meetos/shared';
 import type { z } from 'zod';
 import { getFirebase, rcString } from '../firebase';
+import { recaptchaSiteKey } from '../config';
 import { parseModelJson } from '@meetos/shared';
 
 // ---------------------------------------------------------------- preferences
@@ -155,15 +156,27 @@ function buildModel(task: Pick<StructuredTask<unknown>, 'name' | 'jsonSchema' | 
   return { model, cloudModel };
 }
 
+/** The server's own reason, without the long request URL, so problems can be diagnosed. */
+function serverReason(msg: string): string {
+  const m = /\[(\d{3})[^\]]*\]\s*(.*)$/s.exec(msg);
+  const text = (m ? `${m[1]}: ${m[2]}` : msg).replace(/\s+/g, ' ').trim();
+  return text.length > 220 ? `${text.slice(0, 217)}…` : text;
+}
+
 function friendlyError(e: unknown): string {
   if (e instanceof AIError) {
     const msg = e.message || String(e.code);
-    if (/app.?check/i.test(msg)) return 'Firebase AI Logic rejected the request (App Check). See Settings → AI & privacy.';
+    if (/app.?check/i.test(msg)) {
+      const why = recaptchaSiteKey
+        ? 'This site sent an App Check token but it was not accepted. Check that this domain is allowed on the reCAPTCHA key and that the key is registered for the web app in Firebase App Check.'
+        : 'App Check is enforced for Firebase AI Logic, but this build has no reCAPTCHA key (VITE_RECAPTCHA_ENTERPRISE_SITE_KEY), so no App Check token was sent.';
+      return `Firebase AI Logic rejected the request (App Check). ${why} Server said: ${serverReason(msg)}`;
+    }
     if (/api.?not.?enabled|has not been used|disabled/i.test(msg))
       return 'Firebase AI Logic is not enabled for this Firebase project. See docs/SETUP.md.';
     if (/quota|rate/i.test(msg)) return 'The AI quota for this project was exceeded. Try again shortly.';
-    if (/fetch|network/i.test(msg)) return 'The cloud model could not be reached (network error).';
-    return msg;
+    if (/failed to fetch|networkerror|network error/i.test(msg)) return 'The cloud model could not be reached (network error).';
+    return serverReason(msg);
   }
   return e instanceof Error ? e.message : String(e);
 }

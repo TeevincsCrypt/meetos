@@ -203,3 +203,21 @@ test.describe('without on-device AI', () => {
     expect(cloudCalls).toBe(0);
   });
 });
+
+test('recovers when a new deploy removed the code file a screen needs', async ({ browser }) => {
+  const page = await browser.newPage();
+  await signUp(page, 'Deploy Test', email('deploy'));
+  await createWorkspace(page, 'Deploy Team');
+  // Simulate a tab from the previous deploy: the meeting screen's file is gone (404) once.
+  let blocked = 0;
+  await page.route(/\/assets\/MeetingDetail-[^/]+\.js$/, (route) => {
+    if (blocked++ === 0) return route.fulfill({ status: 404, body: 'Not found' });
+    return route.continue();
+  });
+  await addSampleMeeting(page, 'Sample meeting 1');
+  // The app reloads itself and the meeting opens; no error screen.
+  await expect(page.getByRole('button', { name: 'Analyse', exact: true })).toBeVisible();
+  await expect(page.getByText('Something went wrong on this screen')).toHaveCount(0);
+  expect(blocked).toBeGreaterThanOrEqual(2);
+  await page.close();
+});

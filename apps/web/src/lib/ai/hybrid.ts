@@ -168,7 +168,7 @@ function friendlyError(e: unknown): string {
     const msg = e.message || String(e.code);
     if (/app.?check/i.test(msg)) {
       const why = appCheckSiteKey
-        ? 'This site sent an App Check token but it was not accepted. Check that this domain is allowed on the reCAPTCHA key and that the key is registered for the web app in Firebase App Check.'
+        ? 'This site could not get a valid App Check token. Open Settings → AI & privacy → App Check → Test App Check to see why.'
         : 'App Check is enforced for Firebase AI Logic, but this build has no reCAPTCHA key (VITE_RECAPTCHA_V3_SITE_KEY or VITE_RECAPTCHA_ENTERPRISE_SITE_KEY), so no App Check token was sent.';
       return `Firebase AI Logic rejected the request (App Check). ${why} Server said: ${serverReason(msg)}`;
     }

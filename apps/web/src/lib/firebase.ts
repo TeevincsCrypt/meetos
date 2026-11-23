@@ -15,6 +15,7 @@ import {
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, ReCaptchaV3Provider, type AppCheck } from 'firebase/app-check';
 import { fetchAndActivate, getRemoteConfig, getValue, type RemoteConfig } from 'firebase/remote-config';
 import { getAI, GoogleAIBackend, AgentPlatformBackend, type AI } from 'firebase/ai';
+import { installAppCheckProbe } from './appCheckDiagnostics';
 import { aiBackend, appCheckDebug, appCheckProvider, appCheckSiteKey, firebaseConfig, isFirebaseConfigured, useEmulators } from './config';
 
 export interface FirebaseServices {
@@ -54,6 +55,7 @@ export function getFirebase(): FirebaseServices {
       (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN: string | boolean }).FIREBASE_APPCHECK_DEBUG_TOKEN =
         appCheckDebug === 'true' ? true : appCheckDebug;
     }
+    installAppCheckProbe();
     appCheck = initializeAppCheck(app, {
       provider:
         appCheckProvider === 'recaptcha-enterprise'

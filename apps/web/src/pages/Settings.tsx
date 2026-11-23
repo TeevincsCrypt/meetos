@@ -45,6 +45,7 @@ import { useTheme } from '@/components/AppShell';
 import { Avatar, Badge, Button, Card, CardHeader, cn, ErrorNote, Field, Input, Notice, PageHeader, Segmented, Select, Tabs, Textarea } from '@/components/ui';
 import { ConfirmModal } from '@/components/Forms';
 import { fmtDate } from '@/lib/format';
+import { diagnoseAppCheck, type AppCheckDiagnosis } from '@/lib/appCheckDiagnostics';
 
 type Tab = 'profile' | 'workspace' | 'members' | 'projects' | 'ai' | 'data';
 
@@ -406,12 +407,66 @@ function AiTab() {
           {useEmulators ? (
             <Notice tone="neutral">Running against local emulators — App Check is not used.</Notice>
           ) : appCheckSiteKey ? (
-            <Notice tone="success" icon={ShieldCheck}>App Check is active with {appCheckProviderLabel}. Firebase AI Logic requests carry an App Check token.</Notice>
+            <div className="space-y-3">
+              <Notice tone="neutral" icon={ShieldCheck}>App Check is set up with {appCheckProviderLabel}. Firebase AI Logic requests carry an App Check token.</Notice>
+              <AppCheckTest />
+            </div>
           ) : (
             <Notice tone="warning" icon={ShieldCheck}>App Check isn't configured for this build. If App Check enforcement is on for Firebase AI Logic, cloud requests will be rejected. See docs/SETUP.md.</Notice>
           )}
         </div>
       </Card>
+    </div>
+  );
+}
+
+function AppCheckTest() {
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<AppCheckDiagnosis | null>(null);
+  return (
+    <div className="space-y-3">
+      <Button
+        variant="secondary"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            setResult(await diagnoseAppCheck());
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? 'Testing…' : 'Test App Check'}
+      </Button>
+      {result && (
+        <div className="space-y-2" aria-live="polite">
+          <Notice tone={result.ok ? 'success' : 'warning'} icon={ShieldCheck}>
+            <strong>{result.title}</strong>
+            {result.steps.length > 0 && (
+              <ol className="mt-1.5 list-decimal space-y-1 pl-4">
+                {result.steps.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ol>
+            )}
+          </Notice>
+          <dl className="grid grid-cols-1 gap-x-4 gap-y-1 rounded-lg bg-surface-2 px-3 py-2.5 text-[12px] sm:grid-cols-[auto_minmax(0,1fr)]">
+            {result.facts.map((f) => (
+              <div key={f.label} className="contents">
+                <dt className="text-fg-3">{f.label}</dt>
+                <dd className="break-all font-mono text-fg">{f.value}</dd>
+              </div>
+            ))}
+            {result.technical && (
+              <div className="contents">
+                <dt className="text-fg-3">Technical detail</dt>
+                <dd className="break-all font-mono text-fg">{result.technical}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
     </div>
   );
 }

@@ -57,11 +57,24 @@ Models are configurable without a release through **Remote Config** (step 7). De
 
 ## 6. App Check (required if you enforce it for AI Logic)
 
-**Web (reCAPTCHA Enterprise):**
+**Web — option 1, reCAPTCHA v3 (simplest, no Google Cloud console):**
+
+1. Go to <https://www.google.com/recaptcha/admin/create>. Label `meetos`, type
+   **Score based (v3)**, domains: your deployed domain (e.g. `usemeetos.vercel.app`) and
+   `localhost`. Pick your Firebase project's Google Cloud project if asked. Submit.
+2. You get a **site key** and a **secret key**.
+3. Firebase console → **App Check → Apps** → your web app → **reCAPTCHA** → paste the
+   **secret key** → Save.
+4. Put the **site key** in `VITE_RECAPTCHA_V3_SITE_KEY` (`.env.local` and/or Vercel).
+
+**Web — option 2, reCAPTCHA Enterprise:**
 
 1. Google Cloud console → *Security → reCAPTCHA* → create a **website** key for your domains.
 2. Firebase console → **App Check → Apps** → your web app → **reCAPTCHA Enterprise** → paste the key.
 3. Put the key in `apps/web/.env.local` as `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY`.
+
+**Both options:**
+
 4. Local development: set `VITE_APPCHECK_DEBUG=true`, open the app, copy the debug token printed
    in the browser console, and add it under **App Check → Apps → ⋮ → Manage debug tokens**.
    Never commit a debug token.
@@ -124,7 +137,8 @@ microphone permission that live capture needs.
    | `VITE_FIREBASE_MESSAGING_SENDER_ID` | from config |
    | `VITE_FIREBASE_APP_ID` | from config |
    | `VITE_AI_BACKEND` | `googleai` |
-   | `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY` | only if you use App Check (§6) |
+   | `VITE_RECAPTCHA_V3_SITE_KEY` | App Check site key, reCAPTCHA v3 (§6) |
+   | `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY` | instead of the above, if you use reCAPTCHA Enterprise (§6) |
 
    Do **not** set `VITE_APPCHECK_DEBUG` on Vercel. These values are compiled into the
    build, so redeploy after changing them.
@@ -132,8 +146,8 @@ microphone permission that live capture needs.
 5. **Authorize the domain in Firebase:** Authentication → Settings → **Authorized domains**
    → add `meetos-xyz.vercel.app` (without `https://`). Without this, Google sign-in fails
    with `auth/unauthorized-domain`.
-6. **App Check (if enabled):** Google Cloud console → Security → reCAPTCHA → your key →
-   add the same domain.
+6. **App Check:** add the same domain to your reCAPTCHA key (google.com/recaptcha/admin for
+   v3, or Google Cloud console → Security → reCAPTCHA for Enterprise).
 
 Vercel preview deployments get a new domain each time, and each one would need steps 5–6.
 Give judges your fixed production URL (`*.vercel.app` or a custom domain).

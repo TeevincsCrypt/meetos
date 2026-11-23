@@ -26,7 +26,7 @@ import {
 import type { InferenceSourceLabel } from '@meetos/shared';
 import type { z } from 'zod';
 import { getFirebase, rcString } from '../firebase';
-import { recaptchaSiteKey } from '../config';
+import { appCheckSiteKey } from '../config';
 import { parseModelJson } from '@meetos/shared';
 
 // ---------------------------------------------------------------- preferences
@@ -167,9 +167,9 @@ function friendlyError(e: unknown): string {
   if (e instanceof AIError) {
     const msg = e.message || String(e.code);
     if (/app.?check/i.test(msg)) {
-      const why = recaptchaSiteKey
+      const why = appCheckSiteKey
         ? 'This site sent an App Check token but it was not accepted. Check that this domain is allowed on the reCAPTCHA key and that the key is registered for the web app in Firebase App Check.'
-        : 'App Check is enforced for Firebase AI Logic, but this build has no reCAPTCHA key (VITE_RECAPTCHA_ENTERPRISE_SITE_KEY), so no App Check token was sent.';
+        : 'App Check is enforced for Firebase AI Logic, but this build has no reCAPTCHA key (VITE_RECAPTCHA_V3_SITE_KEY or VITE_RECAPTCHA_ENTERPRISE_SITE_KEY), so no App Check token was sent.';
       return `Firebase AI Logic rejected the request (App Check). ${why} Server said: ${serverReason(msg)}`;
     }
     if (/api.?not.?enabled|has not been used|disabled/i.test(msg))

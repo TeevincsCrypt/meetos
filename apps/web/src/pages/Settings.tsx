@@ -38,7 +38,7 @@ import {
 } from '@/data/workspaces';
 import { db } from '@/data/db';
 import { describeAvailability, prepareOnDeviceModel, setAiPreference, type AiPreference } from '@/lib/ai/hybrid';
-import { aiBackend, recaptchaSiteKey, useEmulators } from '@/lib/config';
+import { aiBackend, appCheckProviderLabel, appCheckSiteKey, useEmulators } from '@/lib/config';
 import { rcString } from '@/lib/firebase';
 import { useAiStatus } from '@/components/AiStatus';
 import { useTheme } from '@/components/AppShell';
@@ -405,8 +405,8 @@ function AiTab() {
         <div className="px-5 pb-5 text-[13px]">
           {useEmulators ? (
             <Notice tone="neutral">Running against local emulators — App Check is not used.</Notice>
-          ) : recaptchaSiteKey ? (
-            <Notice tone="success" icon={ShieldCheck}>App Check is active with reCAPTCHA Enterprise. Firebase AI Logic requests carry an App Check token.</Notice>
+          ) : appCheckSiteKey ? (
+            <Notice tone="success" icon={ShieldCheck}>App Check is active with {appCheckProviderLabel}. Firebase AI Logic requests carry an App Check token.</Notice>
           ) : (
             <Notice tone="warning" icon={ShieldCheck}>App Check isn't configured for this build. If App Check enforcement is on for Firebase AI Logic, cloud requests will be rejected. See docs/SETUP.md.</Notice>
           )}

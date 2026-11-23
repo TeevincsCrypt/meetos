@@ -12,10 +12,10 @@ import {
   persistentMultipleTabManager,
   type Firestore,
 } from 'firebase/firestore';
-import { initializeAppCheck, ReCaptchaEnterpriseProvider, type AppCheck } from 'firebase/app-check';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider, ReCaptchaV3Provider, type AppCheck } from 'firebase/app-check';
 import { fetchAndActivate, getRemoteConfig, getValue, type RemoteConfig } from 'firebase/remote-config';
 import { getAI, GoogleAIBackend, AgentPlatformBackend, type AI } from 'firebase/ai';
-import { aiBackend, appCheckDebug, firebaseConfig, isFirebaseConfigured, recaptchaSiteKey, useEmulators } from './config';
+import { aiBackend, appCheckDebug, appCheckProvider, appCheckSiteKey, firebaseConfig, isFirebaseConfigured, useEmulators } from './config';
 
 export interface FirebaseServices {
   app: FirebaseApp;
@@ -47,7 +47,7 @@ export function getFirebase(): FirebaseServices {
 
   // App Check must be initialised before other services make requests.
   let appCheck: AppCheck | null = null;
-  if (!useEmulators && recaptchaSiteKey) {
+  if (!useEmulators && appCheckSiteKey) {
     if (appCheckDebug && appCheckDebug !== 'false') {
       // Documented debug provider for local development: the SDK logs a debug
       // token you register in the Firebase console. Never ship this enabled.
@@ -55,7 +55,10 @@ export function getFirebase(): FirebaseServices {
         appCheckDebug === 'true' ? true : appCheckDebug;
     }
     appCheck = initializeAppCheck(app, {
-      provider: new ReCaptchaEnterpriseProvider(recaptchaSiteKey),
+      provider:
+        appCheckProvider === 'recaptcha-enterprise'
+          ? new ReCaptchaEnterpriseProvider(appCheckSiteKey)
+          : new ReCaptchaV3Provider(appCheckSiteKey),
       isTokenAutoRefreshEnabled: true,
     });
   }

@@ -12,7 +12,19 @@ export const firebaseConfig = {
 
 export const useEmulators = env.VITE_USE_EMULATORS === 'true';
 export const aiBackend: 'googleai' | 'agentplatform' = env.VITE_AI_BACKEND === 'agentplatform' ? 'agentplatform' : 'googleai';
-export const recaptchaSiteKey = (env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY as string | undefined) || null;
+const enterpriseKey = (env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY as string | undefined)?.trim() || null;
+const v3Key = (env.VITE_RECAPTCHA_V3_SITE_KEY as string | undefined)?.trim() || null;
+/**
+ * App Check provider for this build. reCAPTCHA Enterprise wins if both keys are set;
+ * reCAPTCHA v3 keys are created at google.com/recaptcha/admin (no Cloud console needed).
+ */
+export const appCheckProvider: 'recaptcha-enterprise' | 'recaptcha-v3' | null = enterpriseKey
+  ? 'recaptcha-enterprise'
+  : v3Key
+    ? 'recaptcha-v3'
+    : null;
+export const appCheckSiteKey = enterpriseKey ?? v3Key;
+export const appCheckProviderLabel = appCheckProvider === 'recaptcha-enterprise' ? 'reCAPTCHA Enterprise' : 'reCAPTCHA v3';
 export const appCheckDebug = (env.VITE_APPCHECK_DEBUG as string | undefined) ?? 'false';
 
 export const missingConfigKeys = (['apiKey', 'authDomain', 'projectId', 'appId'] as const).filter((k) => !firebaseConfig[k]);

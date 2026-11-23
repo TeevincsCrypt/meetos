@@ -16,7 +16,7 @@ const enterpriseKey = (env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY as string | undefi
 const v3Key = (env.VITE_RECAPTCHA_V3_SITE_KEY as string | undefined)?.trim() || null;
 /**
  * App Check provider for this build. reCAPTCHA Enterprise wins if both keys are set;
- * reCAPTCHA v3 keys are created at google.com/recaptcha/admin (no Cloud console needed).
+ * classic reCAPTCHA v3 is deprecated for App Check and kept only for projects that already registered one.
  */
 export const appCheckProvider: 'recaptcha-enterprise' | 'recaptcha-v3' | null = enterpriseKey
   ? 'recaptcha-enterprise'

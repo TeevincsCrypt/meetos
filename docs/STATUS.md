@@ -32,7 +32,7 @@ cross-workspace isolation, cloud failure with retry, and "on-device only" making
 | Android app on a device | The APK compiles in CI but hasn't been run on a phone | Install from Android Studio with your `google-services.json` |
 | Android on-device inference | Needs a physical device supported by ML Kit GenAI | Check Settings → This device in the app |
 | Google sign-in | Needs OAuth configuration in your project | `docs/SETUP.md` §3 and §10 |
-| App Check enforcement | Needs a reCAPTCHA v3 (or Enterprise) key / Play Integrity registration | `docs/SETUP.md` §6 |
+| App Check enforcement | Needs a reCAPTCHA Enterprise key / Play Integrity registration | `docs/SETUP.md` §6 |
 
 ## Known limitations
 

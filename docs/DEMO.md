@@ -23,3 +23,6 @@ Use a desktop Chrome with built-in AI available (Settings → AI & privacy shoul
 
 Fallback demo: in a browser without built-in AI, the same flow shows **In the cloud** on every
 result — the labels always reflect what actually ran.
+
+Your own two-meeting walkthrough with fictional transcripts (website relaunch): see
+[`DEMO_TRANSCRIPTS.md`](DEMO_TRANSCRIPTS.md).

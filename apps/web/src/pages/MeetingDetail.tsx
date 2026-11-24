@@ -404,6 +404,7 @@ export default function MeetingDetailPage() {
                     {run.chunksCloudFallback > 0 && <span className="inline-flex items-center gap-1"><InferenceBadge source="cloud_fallback" /> ×{run.chunksCloudFallback}</span>}
                   </div>
                   <p className="text-fg-2">{run.chunkCount} transcript part{run.chunkCount === 1 ? '' : 's'} analysed{run.chunksFailed ? `, ${run.chunksFailed} failed` : ''}.</p>
+                  {run.onDeviceModel && <p className="text-fg-3">On-device model (reported by the device): <code className="font-mono text-[12px]">{run.onDeviceModel}</code></p>}
                   {run.cloudModel && <p className="text-fg-3">Cloud model: <code className="font-mono text-[12px]">{run.cloudModel}</code></p>}
                   {run.discardedUngrounded > 0 && <p className="text-fg-3">{run.discardedUngrounded} item(s) discarded: evidence not found in transcript.</p>}
                   {run.error && <p className="text-danger">{run.error}</p>}

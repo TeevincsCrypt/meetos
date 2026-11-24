@@ -47,6 +47,7 @@ object AnalysisPipeline {
         val earlier = commitments.filter { it.originMeetingId != meeting.id && it.status.isActive }.map { Link(it) }
         val processed = mutableListOf<Extraction.Processed>()
         val sources = mutableListOf<InferenceSourceLabel>()
+        var onDeviceModel: String? = null
         var lastError: String? = null
 
         for (chunk in chunks) {
@@ -59,6 +60,7 @@ object AnalysisPipeline {
                 val r = HybridAi.run(context, prompt, HybridAi.Kind.EXTRACT) { Extraction.validate(it) }
                 processed += Extraction.process(r.data, chunk.text, known, meeting.date, candidates.associate { it.ref to it.commitmentId })
                 sources += r.source
+                if (r.source == InferenceSourceLabel.ON_DEVICE) onDeviceModel = r.model
                 states[chunk.index] = states[chunk.index].copy(state = "done", source = r.source, detail = r.detail)
             } catch (e: Exception) {
                 lastError = e.message
@@ -81,7 +83,7 @@ object AnalysisPipeline {
             fallback = sources.count { it == InferenceSourceLabel.CLOUD_FALLBACK }, failed = failed, discarded = merged.discarded,
             preference = HybridAi.preference(context).wire,
             cloudModel = if (sources.any { it != InferenceSourceLabel.ON_DEVICE }) Firebase.remoteConfig.getString("ai_cloud_model") else null,
-            error = if (failed > 0) lastError else null, startedAt = startedAt,
+            error = if (failed > 0) lastError else null, startedAt = startedAt, onDeviceModel = onDeviceModel,
         )
         // The majority source labels the extracted items; per-chunk sources are kept in the run summary.
         val dominant = sources.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: InferenceSourceLabel.IN_CLOUD

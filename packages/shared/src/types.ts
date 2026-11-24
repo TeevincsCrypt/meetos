@@ -122,6 +122,8 @@ export interface AnalysisRun {
   discardedUngrounded: number;
   inferenceMode: string;
   cloudModel: string | null;
+  /** On-device model name as reported by the device (Android), when any part ran on-device. */
+  onDeviceModel?: string | null;
   error: string | null;
 }
 

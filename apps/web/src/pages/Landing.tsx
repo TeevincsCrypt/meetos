@@ -376,7 +376,7 @@ export function LandingPage({ setupMode }: { setupMode?: boolean }) {
               <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-device-soft text-device"><Cpu className="size-5" aria-hidden /></span>
               <div>
                 <div className="text-[15px] font-semibold text-fg">Processed on this device</div>
-                <p className="mt-1 text-[13px] leading-relaxed text-fg-2">Chrome's built-in model on desktop; Gemini Nano on supported Android phones. Transcript chunks stay on the device for analysis.</p>
+                <p className="mt-1 text-[13px] leading-relaxed text-fg-2">Chrome's built-in Gemini Nano on desktop; Gemini Nano 4 on supported Android phones. Transcript chunks stay on the device for analysis.</p>
               </div>
             </div>
             <div className="flex gap-4 rounded-2xl bg-surface-2 p-5">

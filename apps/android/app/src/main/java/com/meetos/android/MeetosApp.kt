@@ -38,6 +38,8 @@ class MeetosApp : Application() {
             "ai_cloud_model" to "gemini-3.5-flash-lite",
             "ai_reasoning_model" to "gemini-3.5-flash-lite",
             "ai_chunk_chars" to 2400L,
+            // ML Kit model selection: "preview" = Gemini Nano 4 where available, "preview_fast", or "stable".
+            "ai_android_on_device_model" to "preview",
         )
     }
 }

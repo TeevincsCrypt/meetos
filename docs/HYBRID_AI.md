@@ -55,9 +55,23 @@ getGenerativeModel(ai, {
 Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
     modelName = "gemini-3.5-flash-lite",
     generationConfig = generationConfig { responseMimeType = "application/json" },
-    onDeviceConfig = OnDeviceConfig(mode = InferenceMode.PREFER_ON_DEVICE, maxOutputTokens = 1024, temperature = 0.2f),
+    onDeviceConfig = OnDeviceConfig(
+        mode = InferenceMode.PREFER_ON_DEVICE,
+        maxOutputTokens = 1024,
+        temperature = 0.2f,
+        modelOption = OnDeviceModelOption.PREVIEW, // Gemini Nano 4 where available
+    ),
 )
 ```
+
+- **Gemini Nano 4:** `OnDeviceModelOption.PREVIEW` maps to ML Kit's
+  `ModelReleaseStage.PREVIEW` / `ModelPreference.FULL`, which is how the ML Kit Prompt API selects
+  Gemini Nano 4 on phones that have it. Remote Config `ai_android_on_device_model` switches it to
+  `preview_fast` (`ModelPreference.FAST`) or `stable` without a release.
+- **Reported model:** for on-device results MEETOS records `GenerateContentResponse.modelVersion`
+  (the base model name ML Kit reports) in the meeting's analysis run (`onDeviceModel`), and
+  **Settings → This device** shows `onDeviceExtension.getModelName()`. The app never hard-codes
+  "Nano 4" as a label; it shows what the device reports.
 
 - **Reported source:** `GenerateContentResponse.inferenceSource` (`InferenceSource.ON_DEVICE / IN_CLOUD`).
 - **Status / download:** `model.onDeviceExtension?.checkStatus()` and `.download()` (Flow of `DownloadStatus`).
@@ -66,6 +80,10 @@ Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
 - On-device structured output on Android requires KSP `@Generable` classes; MEETOS instead
   constrains the format in the prompt and validates strictly on the client (same contract as web).
 - Android on-device inference is **experimental** and only available on supported devices.
+
+**Web:** Chrome's Prompt API has no model selector. Firebase AI Logic uses whichever Gemini Nano
+build the user's Chrome provides, so the web app labels on-device results "Chrome built-in model"
+rather than naming a version.
 
 ## Validation and grounding (shared by both platforms)
 

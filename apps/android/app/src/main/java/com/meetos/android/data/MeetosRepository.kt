@@ -197,7 +197,8 @@ object MeetosRepository {
     // ------------------------------------------------------------------ analysis persistence
 
     data class RunSummary(val status: String, val chunkCount: Int, val onDevice: Int, val inCloud: Int, val fallback: Int, val failed: Int,
-                          val discarded: Int, val preference: String, val cloudModel: String?, val error: String?, val startedAt: Long)
+                          val discarded: Int, val preference: String, val cloudModel: String?, val error: String?, val startedAt: Long,
+                          val onDeviceModel: String? = null)
 
     private fun ev(m: Meeting, q: com.meetos.android.analysis.Grounding.Quote) =
         mapOf("meetingId" to m.id, "meetingTitle" to m.title, "quote" to q.quote.take(1000), "speaker" to q.speaker)
@@ -290,6 +291,7 @@ object MeetosRepository {
                 "status" to run.status, "startedAt" to ts(run.startedAt), "finishedAt" to FieldValue.serverTimestamp(), "chunkCount" to run.chunkCount,
                 "chunksOnDevice" to run.onDevice, "chunksInCloud" to run.inCloud, "chunksCloudFallback" to run.fallback, "chunksFailed" to run.failed,
                 "discardedUngrounded" to run.discarded, "inferenceMode" to run.preference, "cloudModel" to run.cloudModel, "error" to run.error,
+                "onDeviceModel" to run.onDeviceModel,
             ),
             "status" to "analyzed", "updatedAt" to FieldValue.serverTimestamp(),
         ))

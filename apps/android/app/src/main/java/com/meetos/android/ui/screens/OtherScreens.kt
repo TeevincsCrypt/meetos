@@ -163,7 +163,11 @@ fun SettingsScreen(vm: AppViewModel, nav: NavHostController) {
     var status by remember { mutableStateOf<OnDeviceModelStatus?>(null) }
     var checked by remember { mutableStateOf(false) }
     var download by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(Unit) { status = HybridAi.onDeviceStatus(); checked = true }
+    var modelName by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        status = HybridAi.onDeviceStatus(); checked = true
+        if (status == OnDeviceModelStatus.AVAILABLE) modelName = HybridAi.onDeviceModelName()
+    }
 
     Scaffold(topBar = {
         TopAppBar(title = { androidx.compose.material3.Text("Settings") }, navigationIcon = { IconButton(onClick = { nav.popBackStack() }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back") } })
@@ -183,7 +187,8 @@ fun SettingsScreen(vm: AppViewModel, nav: NavHostController) {
             item {
                 SectionCard(title = "This device") {
                     androidx.compose.material3.Text(if (checked) HybridAi.describe(status) else "Checking…", style = MaterialTheme.typography.bodyMedium)
-                    Muted("On-device inference uses Gemini Nano through ML Kit GenAI and is experimental. It's only available on supported devices; elsewhere MEETOS uses the cloud and labels results accordingly.")
+                    modelName?.let { Muted("Model reported by this device: $it") }
+                    Muted("On-device inference requests Gemini Nano 4 (ML Kit Prompt API, preview model) through Firebase AI Logic. It's only available on supported devices; elsewhere MEETOS uses the cloud and labels results accordingly.")
                     if (status == OnDeviceModelStatus.DOWNLOADABLE || status == OnDeviceModelStatus.DOWNLOADING) {
                         OutlinedButton(enabled = download == null, onClick = {
                             scope.launch {

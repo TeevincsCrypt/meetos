@@ -6,6 +6,7 @@ import com.google.firebase.ai.GenerativeModel
 import com.google.firebase.ai.InferenceMode
 import com.google.firebase.ai.InferenceSource
 import com.google.firebase.ai.OnDeviceConfig
+import com.google.firebase.ai.OnDeviceModelOption
 import com.google.firebase.ai.OnDeviceModelStatus
 import com.google.firebase.ai.DownloadStatus
 import com.google.firebase.ai.ai
@@ -24,8 +25,15 @@ import kotlinx.coroutines.flow.Flow
  * - Cross-meeting reasoning (memory answers): InferenceMode.PREFER_IN_CLOUD —
  *   the SDK uses on-device only when the device is offline.
  *
+ * The on-device model is requested with OnDeviceModelOption.PREVIEW, which is how
+ * ML Kit's Prompt API selects Gemini Nano 4 (the preview release stage) on phones
+ * that have it. Remote Config `ai_android_on_device_model` can switch it to
+ * `preview_fast` or `stable` without a release.
+ *
  * On-device inference on Android is experimental and device-dependent; the
- * reported source always comes from `GenerateContentResponse.inferenceSource`.
+ * reported source always comes from `GenerateContentResponse.inferenceSource`, and
+ * the on-device model name comes from the device (`modelVersion` / `getModelName()`),
+ * never from a hard-coded label.
  */
 object HybridAi {
     enum class Preference(val wire: String, val label: String) {
@@ -53,17 +61,26 @@ object HybridAi {
     private fun cloudModelName(kind: Kind) =
         Firebase.remoteConfig.getString(if (kind == Kind.REASON) "ai_reasoning_model" else "ai_cloud_model").ifBlank { "gemini-3.5-flash-lite" }
 
+    /** Which on-device model ML Kit should use. PREVIEW selects Gemini Nano 4 where available. */
+    private fun onDeviceModelOption(): OnDeviceModelOption =
+        when (Firebase.remoteConfig.getString("ai_android_on_device_model").trim().lowercase()) {
+            "stable" -> OnDeviceModelOption.STABLE
+            "preview_fast" -> OnDeviceModelOption.PREVIEW_FAST
+            else -> OnDeviceModelOption.PREVIEW
+        }
+
     private val cache = HashMap<String, GenerativeModel>()
 
     private fun model(mode: InferenceMode, kind: Kind, json: Boolean = true): GenerativeModel {
         val name = cloudModelName(kind)
-        val key = "$mode:$kind:$json:$name"
+        val option = onDeviceModelOption()
+        val key = "$mode:$kind:$json:$name:$option"
         return cache.getOrPut(key) {
             Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
                 modelName = name,
                 // Applies to the cloud model; the on-device model is constrained by the prompt and validated by MEETOS.
                 generationConfig = if (json) generationConfig { responseMimeType = "application/json" } else null,
-                onDeviceConfig = OnDeviceConfig(mode = mode, maxOutputTokens = 1024, temperature = 0.2f),
+                onDeviceConfig = OnDeviceConfig(mode = mode, maxOutputTokens = 1024, temperature = 0.2f, modelOption = option),
             )
         }
     }
@@ -71,6 +88,10 @@ object HybridAi {
     /** Status of the on-device model on this phone, or null if the SDK reports no on-device support. */
     suspend fun onDeviceStatus(): OnDeviceModelStatus? =
         runCatching { model(InferenceMode.PREFER_ON_DEVICE, Kind.EXTRACT).onDeviceExtension?.checkStatus() }.getOrNull()
+
+    /** Name of the on-device model this phone provides (e.g. a Gemini Nano 4 build), as reported by ML Kit. */
+    suspend fun onDeviceModelName(): String? =
+        runCatching { model(InferenceMode.PREFER_ON_DEVICE, Kind.EXTRACT).onDeviceExtension?.getModelName() }.getOrNull()?.takeIf { it.isNotBlank() }
 
     /** Starts/monitors the on-device model download (collect the flow to run it). */
     fun download(): Flow<DownloadStatus>? = model(InferenceMode.PREFER_ON_DEVICE, Kind.EXTRACT).onDeviceExtension?.download()
@@ -110,7 +131,8 @@ object HybridAi {
                 kind == Kind.REASON -> "Processed in the cloud (cross-meeting task)"
                 else -> "Processed in the cloud — ${describe(status).lowercase()}"
             }
-            return Result(data, source, detail, if (source == InferenceSourceLabel.ON_DEVICE) "Gemini Nano (on-device)" else cloudModelName(kind))
+            val modelName = if (source == InferenceSourceLabel.ON_DEVICE) response.modelVersion?.takeIf { it.isNotBlank() } ?: "Gemini Nano (on-device)" else cloudModelName(kind)
+            return Result(data, source, detail, modelName)
         } catch (invalid: Exception) {
             // Only an on-device result that failed validation is retried in the cloud — and reported as such.
             if (source != InferenceSourceLabel.ON_DEVICE || pref == Preference.ON_DEVICE_ONLY) throw Exception("The AI response could not be validated.", invalid)

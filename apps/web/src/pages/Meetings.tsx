@@ -141,7 +141,7 @@ export default function MeetingsPage() {
           ]}
         />
         {error && <ErrorNote className="m-4">{error}</ErrorNote>}
-        {!ready || list === null ? (
+        {error && list === null ? null : !ready || list === null ? (
           <SkeletonList rows={5} />
         ) : list.length === 0 ? (
           searching ? (

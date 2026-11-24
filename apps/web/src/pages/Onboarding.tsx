@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { Beaker, Mail, Plus } from 'lucide-react';
 import type { Invite } from '@meetos/shared';
 import { Logo } from '@/components/brand';
-import { Badge, Button, Card, ErrorNote, Field, Input, Textarea } from '@/components/ui';
+import { Badge, Button, Card, ErrorNote, Field, Input, missingIndexLink, Textarea } from '@/components/ui';
 import { useSession } from '@/state/auth';
 import { acceptInvite, createWorkspace, findMyInvites } from '@/data/workspaces';
 import { createDemoWorkspace } from '@/lib/demo';
@@ -18,7 +18,13 @@ export function OnboardingPage({ error }: { error?: string | null }) {
 
   useEffect(() => {
     if (!user.email || !user.emailVerified) return;
-    findMyInvites(user.email).then(setInvites).catch(() => setInvites([]));
+    findMyInvites(user.email)
+      .then(setInvites)
+      .catch((e: unknown) => {
+        setInvites([]);
+        // A missing index would otherwise hide every invitation silently.
+        if (missingIndexLink(e instanceof Error ? e.message : '')) setErr(e instanceof Error ? e.message : String(e));
+      });
   }, [user.email, user.emailVerified]);
 
   async function create(e: FormEvent) {

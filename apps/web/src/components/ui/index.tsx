@@ -200,8 +200,33 @@ export function EmptyState({ icon: Icon, title, children, action, compact }: { i
   );
 }
 
+/** Firestore reports a missing index with a console link that creates it. */
+export function missingIndexLink(message: unknown): string | null {
+  if (typeof message !== 'string' || !/requires an index|index.*(building|create)/i.test(message)) return null;
+  return /https:\/\/console\.firebase\.google\.com\/\S+/.exec(message)?.[0].replace(/[.,)]+$/, '') ?? null;
+}
+
 export function ErrorNote({ children, className }: { children: ReactNode; className?: string }) {
-  return <div role="alert" className={cn('rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger', className)}>{children}</div>;
+  const indexLink = missingIndexLink(children);
+  if (indexLink) {
+    const building = /currently building/i.test(String(children));
+    return (
+      <div role="alert" className={cn('rounded-lg border border-warning/30 bg-warning-soft px-3 py-2.5 text-[13px] text-fg-2', className)}>
+        <strong className="text-fg">{building ? 'The database index for this list is still being built.' : 'This list needs a database index that hasn’t been created yet.'}</strong>{' '}
+        {building ? (
+          'This usually takes a few minutes. Reload the page when it’s ready.'
+        ) : (
+          <>
+            A project owner can create it in one click (it takes a few minutes to build).{' '}
+            <a href={indexLink} target="_blank" rel="noreferrer" className="font-medium text-brand-text underline">
+              Create the index in Firebase
+            </a>
+          </>
+        )}
+      </div>
+    );
+  }
+  return <div role="alert" className={cn('break-words rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger', className)}>{children}</div>;
 }
 
 export function Notice({ tone = 'info', icon: Icon, children, className }: { tone?: 'info' | 'warning' | 'success' | 'device' | 'neutral'; icon?: LucideIcon; children: ReactNode; className?: string }) {

@@ -106,6 +106,20 @@ export async function diagnoseAppCheck(): Promise<AppCheckDiagnosis> {
         facts,
       };
     }
+    if (/CreateAssessment|reCAPTCHA Enterprise API is enabled|same project/i.test(lastExchangeFailure?.message ?? '')) {
+      const projectNumber = /^1:(\d+):/.exec(firebaseConfig.appId ?? '')?.[1];
+      return {
+        ok: false,
+        title: 'Firebase could not check the token with reCAPTCHA Enterprise',
+        steps: [
+          `Enable the reCAPTCHA Enterprise API in your Firebase project: https://console.cloud.google.com/apis/library/recaptchaenterprise.googleapis.com?project=${firebaseConfig.projectId ?? 'YOUR_PROJECT_ID'}`,
+          `Make sure the reCAPTCHA key was created in that same project${projectNumber ? ` (project number ${projectNumber})` : ''}. If it was created in another project, create a new key in this one and update Firebase App Check and Vercel.`,
+          'Wait a few minutes, reload this page and test again.',
+        ],
+        technical,
+        facts,
+      };
+    }
     if (status === 403) {
       return {
         ok: false,

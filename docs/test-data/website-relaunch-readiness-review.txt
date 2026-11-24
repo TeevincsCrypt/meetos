@@ -1,0 +1,126 @@
+Ada Mensah: Okay, I think everyone's here. Priya, thanks for joining us, I know you're busy with the holiday orders.
+Priya Nair: Happy to be here. I want to see how the website is coming along before I tell my regulars about it.
+Ada Mensah: Great. And Marcus, welcome. For everyone else, Marcus is helping us with payments and hosting for the next few weeks.
+Marcus Lee: Hi all. Glad to help.
+Grace Kim: Hi Marcus.
+Sam Ortiz: Before we start, did anyone try the new cinnamon rolls? They were gone by nine this morning.
+Tunde Bello: I got the last one. Worth it.
+Ada Mensah: Okay, let's focus. This is the launch readiness review for the Brightside Bakery website. We have five things on the agenda. Progress since last week, the ordering page and payments, the menu page and photos, the newsletter and marketing, and then open questions and risks. We have about forty minutes.
+Ada Mensah: Let's start with progress. I'll go first. I sent the menu prices to Tunde this morning, so that one is finally done. Sorry again for the delay.
+Tunde Bello: Yes, I got them, thank you. They're already in the ordering page.
+Ada Mensah: Grace, the homepage?
+Grace Kim: The homepage design is finished and Tunde has built it. It's live on the staging site now. I'd love feedback from Priya on the photos at the top.
+Priya Nair: I looked at it on my phone this morning. I like it a lot. The only thing is the opening hours are wrong. We open at seven on Saturdays, not eight.
+Grace Kim: Good catch. I'll fix the Saturday opening hours on the homepage today.
+Ada Mensah: Thanks. Sam, how is the newsletter?
+Sam Ortiz: The newsletter is updated with the new launch date of December 9. I finished that yesterday, so it's a day early. The draft is in the shared folder.
+Ada Mensah: Perfect. Tunde, the ordering page?
+Tunde Bello: The ordering page is about seventy percent done. Customers can pick items, choose a pickup time and see the total. The part that's missing is the actual payment step, which is where Marcus comes in.
+Ada Mensah: Are you still on track for Friday?
+Tunde Bello: For the ordering page without payments, yes, Friday is fine. With payments, it depends on Marcus.
+Ada Mensah: Okay, let's go straight into that. Marcus, where are we with payments?
+Marcus Lee: So I've opened an account with the payment provider for the bakery. The problem is that the account needs business verification before we can take real payments. They asked for the business registration document and a bank statement. Until they verify us, I'm blocked. I can only use test mode.
+Priya Nair: I have the registration document at home. The bank statement I can download.
+Marcus Lee: If you can send both to me, I can upload them. Verification usually takes two to three business days.
+Priya Nair: I'll send you the registration document and the bank statement tomorrow morning.
+Marcus Lee: Great. Once they verify the account, I'll connect payments to the ordering page. I'd say I can finish the payment integration by December 3rd, assuming verification comes through by Monday.
+Ada Mensah: That's cutting it close to the December 9 launch, but it works. Tunde, can you and Marcus test the full checkout together once it's connected?
+Tunde Bello: Yes. I'll test the full checkout with Marcus on December 4th.
+Marcus Lee: Works for me.
+Ada Mensah: Now, a related question. Do we want customers to be able to pay at pickup as well, or only online?
+Priya Nair: A lot of my older customers will want to pay in the shop. I don't want to lose them.
+Tunde Bello: Pay at pickup is actually easier for me. It's just a different button that skips the payment step.
+Marcus Lee: The risk is no-shows. People order, don't pay, and never come.
+Sam Ortiz: We could limit pay at pickup to orders under a certain amount.
+Ada Mensah: I like that. What amount?
+Priya Nair: Fifty dollars. Anything bigger, like a birthday cake, has to be paid online.
+Ada Mensah: Okay, so let's decide. Customers can choose pay at pickup for orders under fifty dollars, and orders of fifty dollars or more must be paid online. Does everyone agree?
+Priya Nair: Agreed.
+Marcus Lee: Agreed.
+Tunde Bello: Agreed. I'll add the pay at pickup option to the ordering page by Friday as well.
+Grace Kim: Agreed.
+Sam Ortiz: Agreed.
+Ada Mensah: Good. Next, the menu page and photos. Grace?
+Grace Kim: So last week I said I'd shoot the menu photos on Thursday. Thursday is now a problem because the bakery is closed for the delivery inspection that day.
+Priya Nair: Yes, sorry, the inspector moved it.
+Grace Kim: No problem. I need to move the menu photo shoot to Saturday morning instead. Priya, can we do it before the shop opens, around six?
+Priya Nair: Six is fine. I'll have the cakes and the bread ready on the front counter.
+Grace Kim: Then I'll shoot the menu photos on Saturday and have them edited by Monday.
+Ada Mensah: Thanks. How many items are on the menu page?
+Tunde Bello: Forty two items right now. Some of them are seasonal.
+Priya Nair: We should hide the seasonal items after New Year. The pumpkin bread doesn't sell in January.
+Tunde Bello: I can add a simple switch to hide items. It's maybe an hour of work.
+Ada Mensah: Should we build that now or after the launch?
+Tunde Bello: Honestly, after the launch. I don't want to add anything that's not essential before December 9.
+Ada Mensah: Agreed. The seasonal switch waits until after the launch. Priya, are you okay with that?
+Priya Nair: Yes, as long as it's done before the end of December.
+Ada Mensah: Tunde, can you take that?
+Tunde Bello: Sure. I'll build the seasonal item switch after the launch, before the end of December.
+Ada Mensah: Okay. Now, allergens. We had a customer email last week asking about nut allergies.
+Priya Nair: This is important to me. Every item needs to list its allergens. Nuts, gluten, dairy and eggs at least.
+Grace Kim: I can design little allergen icons for the menu page.
+Tunde Bello: I'll need the allergen list for every item in a spreadsheet.
+Priya Nair: My head baker has that information. I'll get the allergen list for every item to Tunde by Friday.
+Grace Kim: And I'll design the allergen icons by Thursday.
+Ada Mensah: Good. That makes allergens a launch requirement, not a nice to have. Everyone agree?
+Tunde Bello: Agreed.
+Sam Ortiz: Agreed.
+Priya Nair: Definitely agreed.
+Ada Mensah: Moving on to marketing. Sam?
+Sam Ortiz: The newsletter goes out on launch day, December 9, at eight in the morning. We have about nine hundred subscribers. I also want to put flyers in the shop the week before launch.
+Priya Nair: The print shop on Elm Street does our flyers. Jordan there is very fast.
+Sam Ortiz: Great. I'll design the flyer and send it to the print shop by December 1st.
+Ada Mensah: What about social media?
+Sam Ortiz: I'd like to post a countdown on Instagram, one post a day for the five days before launch. I'll write the five countdown posts by December 2nd.
+Grace Kim: I can make the images for the countdown posts if you send me the text.
+Sam Ortiz: That would be amazing.
+Grace Kim: Then I'll make the countdown images within two days of getting the text.
+Ada Mensah: Do we want a launch discount?
+Sam Ortiz: I was going to suggest ten percent off the first online order.
+Priya Nair: Ten percent is fine, but only for the first week.
+Marcus Lee: Discount codes are easy with the payment provider. I can set one up.
+Ada Mensah: Then we're decided. Ten percent off the first online order, valid for the first week after launch.
+Sam Ortiz: Agreed.
+Priya Nair: Agreed.
+Marcus Lee: I'll set up the launch discount code by December 7th.
+Ada Mensah: Thanks. Now, one change I want to raise. Last week we said gift cards would wait until January. Priya, you mentioned you wanted to revisit that?
+Priya Nair: Yes. I talked to my accountant. Gift cards before Christmas would bring in a lot of money, but the accountant says we need a proper system to track the balances, and that takes time. So I'd rather push gift cards to February, after the holiday rush, and do it properly.
+Ada Mensah: Okay. So the decision changes. Gift cards move from January to February. Is everyone fine with that?
+Sam Ortiz: Fine with me. Less to promote in January anyway.
+Tunde Bello: Agreed.
+Marcus Lee: Agreed.
+Grace Kim: Agreed.
+Ada Mensah: Good. Let's go to open questions and risks. I have a list. First one. Do we need a cookie banner on the website?
+Marcus Lee: It depends on whether we use analytics that set cookies. If we only use the basic hosting statistics, maybe not.
+Ada Mensah: I don't think any of us knows the legal answer for sure.
+Priya Nair: I can ask my accountant if she knows a lawyer.
+Ada Mensah: Let's leave the cookie banner as an open question for now and come back to it next week.
+Ada Mensah: Second question. Who answers customer emails that come in through the website contact form?
+Priya Nair: Not me, I'm in the kitchen from four in the morning.
+Sam Ortiz: I could maybe look at them sometimes, but I can't promise anything.
+Ada Mensah: Okay, that's still open then. We need an owner for the contact form emails before launch.
+Ada Mensah: Third. What happens if the website goes down on launch day?
+Marcus Lee: The hosting has good uptime, but I'd like a simple status check that emails me if the site goes down. I'll set up uptime monitoring by December 5th.
+Ada Mensah: Great, thank you. Fourth, the domain name. Do we own brightsidebakery dot com?
+Priya Nair: My nephew bought it years ago. I'm not sure if it's in my name.
+Marcus Lee: That's a real risk. If it's not in your name, we can't point it to the new site.
+Priya Nair: I'll call my nephew tonight and ask him to transfer the domain to me.
+Marcus Lee: If he does, send me the transfer code and I'll handle the rest.
+Ada Mensah: That one's a blocker for launch, so please let us know as soon as you hear back.
+Priya Nair: I will.
+Ada Mensah: Fifth, accessibility. Grace, did you check the colour contrast?
+Grace Kim: I did. The main colours pass. The light pink buttons don't, so I'll darken them. I'll fix the button contrast by Wednesday.
+Ada Mensah: Thanks. Anything else from anyone?
+Tunde Bello: One thing. The pickup time slots. Right now customers can pick any fifteen minute slot. On busy Saturday mornings, that could be chaos.
+Priya Nair: We can handle about ten pickups every fifteen minutes. More than that and the queue goes out the door.
+Tunde Bello: Then I'll limit each pickup slot to ten orders. I can do that by Friday along with the rest.
+Ada Mensah: Perfect. Let me recap what I have. Decisions today. Pay at pickup for orders under fifty dollars, online payment for anything bigger. Allergens are a launch requirement. The seasonal switch waits until after launch. Ten percent off the first online order for the first week. And gift cards move to February.
+Sam Ortiz: That matches my notes.
+Ada Mensah: Open items. The cookie banner, and who owns the contact form emails. And the big risks are payment verification and the domain transfer.
+Marcus Lee: Yes, those two are the ones that could move the launch date.
+Ada Mensah: Then let's meet again next Tuesday to check on those. If either one isn't solved by then, we'll talk about whether December 9 still holds.
+Priya Nair: Sounds good. Thank you all, this is exciting.
+Grace Kim: Thanks everyone.
+Tunde Bello: Thanks.
+Sam Ortiz: See you next week.
+Marcus Lee: Thanks, bye.

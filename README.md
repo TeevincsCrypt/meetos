@@ -17,7 +17,7 @@ actually ran.
 | Android app | `apps/android` — Kotlin + Jetpack Compose, Room, Firebase Android SDK |
 | Shared logic | `packages/shared` — domain model, grounding, chunking, linking, retrieval, metrics |
 | Firebase | `firebase/` — security rules, indexes, rules tests |
-| Docs | [`docs/SETUP.md`](docs/SETUP.md) · [`docs/HYBRID_AI.md`](docs/HYBRID_AI.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DEMO.md`](docs/DEMO.md) · [`docs/DEMO_TRANSCRIPTS.md`](docs/DEMO_TRANSCRIPTS.md) · [`docs/STATUS.md`](docs/STATUS.md) |
+| Docs | [`docs/SETUP.md`](docs/SETUP.md) · [`docs/HYBRID_AI.md`](docs/HYBRID_AI.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DEMO.md`](docs/DEMO.md) · [`docs/DEMO_TRANSCRIPTS.md`](docs/DEMO_TRANSCRIPTS.md) · [`docs/TESTING_GUIDE.md`](docs/TESTING_GUIDE.md) · [`docs/STATUS.md`](docs/STATUS.md) |
 
 | Landing | Live meeting room | Commitment Graph |
 |---|---|---|

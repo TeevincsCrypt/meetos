@@ -62,12 +62,15 @@ Models are configurable without a release through **Remote Config** (step 7). De
 Classic reCAPTCHA v3 keys are deprecated for App Check and Firebase no longer accepts them for
 new web apps, so use an Enterprise key.
 
-1. Open `https://console.cloud.google.com/security/recaptcha?project=YOUR_PROJECT_ID`
+1. Enable the **reCAPTCHA Enterprise API** in the same project:
+   `https://console.cloud.google.com/apis/library/recaptchaenterprise.googleapis.com?project=YOUR_PROJECT_ID`.
+   Without it, App Check rejects every token with "Unable to call the reCAPTCHA Enterprise
+   CreateAssessment method". Then open `https://console.cloud.google.com/security/recaptcha?project=YOUR_PROJECT_ID`
    (your Firebase project ID). Enable the API if asked, then **Create key**: application type
    **Web**, add your deployed domain (e.g. `usemeetos.vercel.app`) and `localhost`, and leave
    the checkbox challenge off (score-based).
 2. Firebase console → **App Check → Apps** → your web app → **reCAPTCHA Enterprise** → paste
-   the key ID → Save.
+   the key ID → Save. The key must be created in the same project as the Firebase app.
 3. Set `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY` to the same key ID (`.env.local` and/or Vercel).
 
 (`VITE_RECAPTCHA_V3_SITE_KEY` still works for projects that registered a classic v3 key
@@ -78,7 +81,9 @@ earlier; new projects should not use it.)
 4. Local development: set `VITE_APPCHECK_DEBUG=true`, open the app, copy the debug token printed
    in the browser console, and add it under **App Check → Apps → ⋮ → Manage debug tokens**.
    Never commit a debug token.
-5. When everything works, **App Check → APIs → Firebase AI Logic → Enforce**.
+5. Check it in MEETOS: **Settings → AI & privacy → App Check → Test App Check** explains any
+   failure using the server's own message.
+6. When the test is green, **App Check → APIs → Firebase AI Logic → Enforce**.
 
 **Android:** debug builds use the debug provider (copy the token from logcat tag
 `DebugAppCheckProvider` and register it as above); release builds use **Play Integrity**

@@ -31,8 +31,8 @@ cross-workspace isolation, cloud failure with retry, and "on-device only" making
 | Real Chrome built-in model output quality | Headless test browser has no on-device model | Use a supported desktop Chrome |
 | Android app on a device | The APK compiles in CI but hasn't been run on a phone | Install from Android Studio with your `google-services.json` |
 | Android on-device inference | Needs a physical device supported by ML Kit GenAI | Check Settings → This device in the app |
-| Google sign-in | Needs OAuth configuration in your project | `docs/SETUP.md` §3 and §10 |
-| App Check enforcement | Needs a reCAPTCHA Enterprise key / Play Integrity registration | `docs/SETUP.md` §6 |
+| Google sign-in on Android | Needs the Web client ID and SHA-1 in your project | `docs/SETUP.md` §10 |
+| App Check on Android | Needs Play Integrity registration (web App Check with reCAPTCHA Enterprise was confirmed working on the live site on 2026-11-24) | `docs/SETUP.md` §6 |
 
 ## Known limitations
 

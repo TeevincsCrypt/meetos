@@ -1,0 +1,173 @@
+1
+00:00:00,000 --> 00:00:04,586
+Meetings shouldn't end with notes.
+
+2
+00:00:04,636 --> 00:00:09,905
+They should end with work getting done.
+
+3
+00:00:09,955 --> 00:00:11,950
+This is Meetos.
+
+4
+00:00:12,000 --> 00:00:16,016
+Every meeting creates promises: who
+will do what, and by when.
+
+5
+00:00:16,066 --> 00:00:17,458
+Most of them get lost.
+
+6
+00:00:17,508 --> 00:00:22,704
+Meetos remembers every commitment and follows
+it across meetings, until a person
+
+7
+00:00:22,754 --> 00:00:23,950
+confirms it's done.
+
+8
+00:00:24,000 --> 00:00:31,342
+You can record a meeting live, with
+everyone's consent, or upload a transcript.
+
+9
+00:00:31,392 --> 00:00:36,207
+Here's a forty-minute launch
+review with six people.
+
+10
+00:00:36,257 --> 00:00:39,950
+Meetos finds the speakers automatically.
+
+11
+00:00:40,000 --> 00:00:44,950
+Analysis runs through Firebase AI
+Logic hybrid inference.
+
+12
+00:00:45,000 --> 00:00:51,003
+When this device can run Gemini Nano,
+the transcript never leaves it.
+
+13
+00:00:51,053 --> 00:00:54,599
+Otherwise Gemini in the cloud takes over.
+
+14
+00:00:54,649 --> 00:00:58,897
+Every part is labelled with
+where it really ran —
+
+15
+00:00:58,947 --> 00:00:59,950
+no guessing.
+
+16
+00:01:00,000 --> 00:01:05,917
+Out come decisions, commitments,
+owners and deadlines.
+
+17
+00:01:05,967 --> 00:01:09,453
+'By Friday' becomes a real date.
+
+18
+00:01:09,503 --> 00:01:18,624
+Every item quotes the exact line it came from,
+and anything the AI can't back up is
+
+19
+00:01:18,674 --> 00:01:19,950
+thrown away.
+
+20
+00:01:20,000 --> 00:01:24,425
+This is the Commitment Graph.
+
+21
+00:01:24,475 --> 00:01:36,617
+Meetos linked this meeting to promises from
+the last two weeks: a deadline that
+
+22
+00:01:36,667 --> 00:01:44,950
+moved, a blocker, and a task
+someone says is finished.
+
+23
+00:01:45,000 --> 00:01:48,640
+But the AI never closes a task.
+
+24
+00:01:48,690 --> 00:01:51,260
+A person confirms it —
+
+25
+00:01:51,310 --> 00:01:54,950
+and the database enforces that.
+
+26
+00:01:55,000 --> 00:02:05,368
+Decisions are remembered too: who agreed, and
+when a later decision replaced an
+
+27
+00:02:05,418 --> 00:02:06,950
+earlier one.
+
+28
+00:02:07,000 --> 00:02:09,580
+Ask your meetings anything.
+
+29
+00:02:09,630 --> 00:02:14,450
+Answers come only from your
+records, with sources.
+
+30
+00:02:14,500 --> 00:02:21,950
+And if it was never discussed, Meetos says
+so instead of making something up.
+
+31
+00:02:22,000 --> 00:02:32,156
+Before the next meeting, Meetos prepares a
+briefing: what's overdue, what's blocked,
+
+32
+00:02:32,206 --> 00:02:34,950
+and a suggested agenda.
+
+33
+00:02:35,000 --> 00:02:40,426
+Execution shows how commitments are
+really going, from real records —
+
+34
+00:02:40,476 --> 00:02:44,950
+and the Daily Brief tells you what
+needs attention today.
+
+35
+00:02:45,000 --> 00:02:47,165
+You choose where AI runs.
+
+36
+00:02:47,215 --> 00:02:51,950
+On-device only means nothing is
+sent to a cloud model.
+
+37
+00:02:52,000 --> 00:02:52,495
+Meetos.
+
+38
+00:02:52,545 --> 00:02:55,690
+Meetings that end with work getting done.
+
+39
+00:02:55,740 --> 00:02:57,950
+Built with Firebase AI Logic.

@@ -23,6 +23,8 @@ actually ran.
 |---|---|---|
 | ![Landing page](docs/screenshots/landing.png) | ![Live meeting room](docs/screenshots/live-meeting-room.png) | ![Commitment Graph](docs/screenshots/commitment-graph.png) |
 
+_The Commitment Graph screenshot comes from the automated end-to-end test environment, where Chrome's on-device model is replaced by a clearly labelled test double (`apps/web/e2e/fake-language-model.ts`), so its "On this device" labels are not from real on-device inference._
+
 ## What it does
 
 - **Commitment Graph** — every promise ("I'll finish the landing page before Friday") becomes a

@@ -51,6 +51,8 @@ export function authErrorMessage(e: unknown): string {
     case 'auth/popup-closed-by-user':
     case 'auth/cancelled-popup-request':
       return 'Sign-in was cancelled.';
+    case 'auth/popup-blocked':
+      return 'Your browser blocked the Google sign-in window. Allow pop-ups for this site (in Chrome, click the blocked-pop-up icon at the right of the address bar), then try again.';
     case 'auth/operation-not-allowed':
       return 'This sign-in method is not enabled in the Firebase console (Authentication → Sign-in method).';
     case 'auth/unauthorized-domain':
